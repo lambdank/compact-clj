@@ -1,0 +1,5 @@
+.zprint.edn
+.lsp/
+.nrepl-port
+.cpcache
+.clj-kondo/.cache

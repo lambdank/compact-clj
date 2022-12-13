@@ -1,0 +1,16 @@
+{:hooks {:analyze-call
+         {clojure.core/= hooks.eq/all
+          clojure.core/and hooks.and/all
+          clojure.core/assoc hooks.assoc/all
+          clojure.core/filter hooks.filter/all
+          clojure.core/first hooks.first/all
+          clojure.core/if hooks.if/all
+          clojure.core/into hooks.not/all
+          clojure.core/let hooks.let/all
+          clojure.core/map hooks.map/all
+          clojure.core/not hooks.not/all
+          clojure.core/or hooks.or/all
+          clojure.core/vec hooks.vec/all
+          clojure.core/when hooks.when/all
+          clojure.core/when-let hooks.when-let/all}}
+ :linters {:lol {:level :warning}}}
