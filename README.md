@@ -34,6 +34,13 @@ You might need to ignore this in your git projects, if you are the only one usin
 (assoc (assoc {} :a x) :b y) -> (assoc {} :a x :b y)
 ```
 
+## `conj`
+```clojure
+
+;; remove nested assocs
+(conj (conj [] x) y) -> (conj [] x y)
+```
+
 ## `=`
 ```clojure
 ;; = -> true?

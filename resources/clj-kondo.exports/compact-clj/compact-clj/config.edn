@@ -2,6 +2,7 @@
          {clojure.core/= hooks.eq/all
           clojure.core/and hooks.and/all
           clojure.core/assoc hooks.assoc/all
+          clojure.core/conj hooks.conj/all
           clojure.core/filter hooks.filter/all
           clojure.core/first hooks.first/all
           clojure.core/if hooks.if/all
