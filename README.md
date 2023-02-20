@@ -37,7 +37,7 @@ You might need to ignore this in your git projects, if you are the only one usin
 ## `conj`
 ```clojure
 
-;; remove nested assocs
+;; remove nested conjs
 (conj (conj [] x) y) -> (conj [] x y)
 ```
 
