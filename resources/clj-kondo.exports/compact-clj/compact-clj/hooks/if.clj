@@ -28,7 +28,9 @@
   (let [[$if $test $then $else] children
         {[& $then-args] :children} $then
         {[& $else-args] :children} $else]
-    (when (= (count $then-args) (count $else-args))
+    (when (and (= (count $then-args) (count $else-args))
+               (u/list? $then-args)
+               (u/list? $else-args))
       (let [pairs (partition 2 (interleave $then-args $else-args))
             diff (keep-indexed #(when-not (= (first %2) (second %2)) [%1 %2]) pairs)]
         (when (= (count diff) 1)
