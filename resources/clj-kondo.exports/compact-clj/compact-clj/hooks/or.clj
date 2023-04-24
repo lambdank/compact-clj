@@ -16,6 +16,16 @@
                 {:message (u/->msg node (str "(some " pred " [" (str/join " " args) "])"))
                  :type :lol}))))))
 
+(defn or->get [node]
+  (let [{[$or $args-1 $args-2 & $args] :children} node
+        {[$args-1-1 $args-1-2] :children} $args-1]
+    (when (and (zero? (count $args))
+               (u/keyword? $args-1-1))
+      (api/reg-finding!
+         (merge (meta $or)
+                {:message (u/->msg node (str "(" $args-1-1 " " $args-1-2 " " $args-2 ")"))
+                 :type :lol})))))
+
 (defn all [{:keys [node]}]
   (when (u/in-source? node)
-    (or->some node)))
+    ((juxt or->some or->get) node)))

@@ -16,3 +16,13 @@
             :message "(or (even? 5) (even? 7) (even? 8)) -shorten-> (some even? [5 7 8])"
             :type :lol}
            (hooks.or/or->some (api/parse-string code))))))
+
+(deftest or->get-test
+  (let [code "(or (:a x) y)"]
+    (is (= {:row 1
+            :end-row 1
+            :col 2
+            :end-col 4
+            :message "(:a x y)"
+            :type :lol}
+           (hooks.or/or->get (api/parse-string code))))))
