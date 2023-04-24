@@ -13,5 +13,7 @@
           clojure.core/or hooks.or/all
           clojure.core/vec hooks.vec/all
           clojure.core/when hooks.when/all
-          clojure.core/when-let hooks.when-let/all}}
+          clojure.core/when-let hooks.when-let/all
+          clojure.core/- hooks.minus/all
+          clojure.core/+ hooks.plus/all}}
  :linters {:lol {:level :warning}}}
