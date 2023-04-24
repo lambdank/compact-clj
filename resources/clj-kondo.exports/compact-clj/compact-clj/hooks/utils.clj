@@ -2,6 +2,7 @@
   (:require
    [clj-kondo.hooks-api :as api]))
 
+
 (defn ->msg [old new]
   (str old " -shorten-> " new))
 
@@ -16,6 +17,9 @@
 
 (defn symbol? [{:keys [string-value]} s]
   (= string-value s))
+
+(defn keyword? [node]
+  (api/keyword-node? node))
 
 (defn coll? [{:keys [tag]}]
   (#{:list :vector :set} tag))
