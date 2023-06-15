@@ -14,6 +14,16 @@
                                {:message (u/->msg node (str "(mapv " $f " " (str/join " " $colls) ")"))
                                 :type :lol})))))
 
+(defn vec->filterv [node]
+  (let [children (:children node)
+        [$vec $1] children
+        [$filter $pred $coll] (:children $1)]
+    (when (and (= (count children) 2)
+               (u/symbol? $filter "filter"))
+      (api/reg-finding! (merge (meta $vec)
+                               {:message (u/->msg node (str "(filterv " $pred " " $coll ")"))
+                                :type :lol})))))
+
 (defn all [{:keys [node]}]
   (when (u/in-source? node)
     (vec->mapv node)))

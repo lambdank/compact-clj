@@ -16,3 +16,13 @@
             :message "(vec (map + [1 2 3] [4 5 6])) -shorten-> (mapv + [1 2 3] [4 5 6])"
             :type :lol}
            (hooks.vec/vec->mapv (api/parse-string code))))))
+
+(deftest vec->filterv-test
+  (let [code "(vec (filter even? [1 2 3 4]))"]
+    (is (= {:row 1
+            :col 2
+            :end-row 1
+            :end-col 5
+            :message "(vec (filter even? [1 2 3 4])) -shorten-> (filterv even? [1 2 3 4])"
+            :type :lol}
+           (hooks.vec/vec->filterv (api/parse-string code))))))
