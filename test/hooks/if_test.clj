@@ -37,6 +37,16 @@
             :type :lol}
            (hooks.if/if->boolean (api/parse-string code))))))
 
+(deftest if->not
+  (let [code "(if (p x) false true)"]
+    (is (= {:row 1
+            :end-row 1
+            :col 2
+            :end-col 4
+            :message "(if (p x) false true) -shorten-> (not (p x))"
+            :type :lol}
+           (hooks.if/if->not (api/parse-string code))))))
+
 (deftest if->cond->test
   (let [code "(if (= a b) (inc a) a)"]
     (is (= {:row 1

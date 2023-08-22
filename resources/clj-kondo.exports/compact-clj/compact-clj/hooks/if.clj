@@ -31,6 +31,14 @@
        (assoc (meta $if)
               :message (u/->msg node (str "(boolean " $test ")"))
               :type :lol)))))
+
+(defn if->not [{:keys [children] :as node}]
+  (let [[$if $test $then $else] children]
+    (when (and (u/symbol? $then "false")
+               (u/symbol? $else "true"))
+      (api/reg-finding!
+       (assoc (meta $if)
+              :message (u/->msg node (str "(not " $test ")"))
               :type :lol)))))
 
 (defn if->cond-> [{:keys [children] :as node}]
@@ -67,4 +75,4 @@
 
 (defn all [{:keys [node]}]
   (when (u/in-source? node)
-    ((juxt if->if-not if->when if->boolean if->cond-> if-move-to-inner) node)))
+    ((juxt if->if-not if->when if->boolean if->not if->cond-> if-move-to-inner) node)))

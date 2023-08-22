@@ -76,6 +76,8 @@ You might need to ignore this in your git projects, if you are the only one usin
 (if (p x) y nil) -> (when (p x) y)
 ;; if -> boolean
 (if (p x) true false) -> (boolean (p x))
+;; if -> not
+(if (p x) false true) -> (not (p x))
 ;; if -> cond->
 (if (f x) (g x) x) -> (cond-> x (f x) (g))
 ;; move if inside
