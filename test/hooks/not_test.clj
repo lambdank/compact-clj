@@ -28,16 +28,16 @@
          :type :lol}
         (hooks.not/not->not-any? (api/parse-string code))))))
 
-(deftest not->identity-test
-  (let [code "(not (not true))"]
+(deftest not->boolean-test
+  (let [code "(not (not x))"]
     (is
      (= {:row 1
          :end-row 1
          :col 2
          :end-col 5
-         :message "(not (not true)) -shorten-> true"
+         :message "(not (not x)) -shorten-> (boolean x)"
          :type :lol}
-        (hooks.not/not->identity (api/parse-string code))))))
+        (hooks.not/not->boolean (api/parse-string code))))))
 
 (deftest not->not-every?-test
   (let [code "(not (every? odd? [1 2 3]))"]

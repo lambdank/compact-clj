@@ -24,12 +24,12 @@
                         (str "(not-any? " $1-2 " " (str/join " " $1-args) ")"))
               :type :lol)))))
 
-(defn not->identity [{:keys [children] :as node}]
+(defn not->boolean [{:keys [children] :as node}]
   (let [[$not {[$1-1 $1-2] :children}] children]
     (when (u/symbol? $1-1 "not")
       (api/reg-finding!
        (assoc (meta $not)
-              :message (u/->msg node $1-2)
+              :message (u/->msg node (str "(boolean " $1-2 ")"))
               :type :lol)))))
 
 (defn not->not-every? [{:keys [children] :as node}]
@@ -98,6 +98,6 @@
 
 (defn all [{:keys [node]}]
   (when (u/in-source? node)
-    ((juxt not->not= not->not-any? not->identity not->not-every?
+    ((juxt not->not= not->not-any? not->boolean not->not-every?
            not->seq not->even? not->odd? not->true? not->false?
            not->some? not->empty?) node)))

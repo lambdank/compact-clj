@@ -113,7 +113,7 @@ You might need to ignore this in your git projects, if you are the only one usin
 ;; not -> not-any?
 (not (some f coll)) -> (not-any? f coll)
 ;; not -> identity
-(not (not x)) -> x
+(not (not x)) -> (boolean x)
 ;; not -> not-every?
 (not (every? f coll)) -> (not-every? f coll)
 ;; not -> seq
