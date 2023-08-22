@@ -15,6 +15,14 @@
               :message (u/->msg node (str "(if-not " $test-2 " " $then " " $else ")"))
               :type :lol)))))
 
+(defn if->when [{:keys [children] :as node}]
+  (let [[$if $test $then $else] children]
+    (when (u/symbol? $else "nil")
+      (api/reg-finding!
+       (assoc (meta $if)
+              :message (u/->msg node (str "(when " $test " " $then ")"))
+              :type :lol)))))
+
 (defn if->cond-> [{:keys [children] :as node}]
   (let [[$if $test $then $else] children
         [$then-1 $then-2 & $then-args] (:children $then)]
@@ -49,4 +57,4 @@
 
 (defn all [{:keys [node]}]
   (when (u/in-source? node)
-    ((juxt if->if-not if->cond-> if-move-to-inner) node)))
+    ((juxt if->if-not if->when if->cond-> if-move-to-inner) node)))

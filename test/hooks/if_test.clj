@@ -17,6 +17,16 @@
             :type :lol}
            (hooks.if/if->if-not (api/parse-string code))))))
 
+(deftest if->when-test
+  (let [code "(if (p x) y nil)"]
+    (is (= {:row 1
+            :end-row 1
+            :col 2
+            :end-col 4
+            :message "(if (p x) y nil) -shorten-> (when (p x) y)"
+            :type :lol}
+           (hooks.if/if->when (api/parse-string code))))))
+
 (deftest if->cond->test
   (let [code "(if (= a b) (inc a) a)"]
     (is (= {:row 1

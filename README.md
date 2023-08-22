@@ -72,6 +72,8 @@ You might need to ignore this in your git projects, if you are the only one usin
 ```clojure
 ;; if -> if-not
 (if (not x) y z) -> (if-not x y z)
+;; if -> when
+(if (p x) y nil) -> (when (p x) y)
 ;; if -> cond->
 (if (f x) (g x) x) -> (cond-> x (f x) (g))
 ;; move if inside
