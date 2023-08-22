@@ -25,7 +25,9 @@
             :end-col 4
             :message "(if (= a b) (inc a) a) -shorten-> (cond-> a (= a b) (inc))"
             :type :lol}
-           (hooks.if/if->cond-> (api/parse-string code))))))
+           (hooks.if/if->cond-> (api/parse-string code)))))
+  (let [code "(if (= 2 2) (f) nil)"]
+    (is (nil? (hooks.if/if->cond-> (api/parse-string code))))))
 
 (deftest if-move-to-inner
   (let [code "(if (= a b) (f x a y) (f x b y))"]

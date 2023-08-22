@@ -1,14 +1,15 @@
 (ns ^:no-doc hooks.if
   (:require
    [clj-kondo.hooks-api :as api]
-   [clojure.set :refer [difference]]
    [clojure.string :as str]
    [hooks.utils :as u]))
 
 (defn if->if-not [{:keys [children] :as node}]
   (let [[$if $test $then $else] children
         [$test-1 $test-2] (:children $test)]
-    (when (and (u/list? $test) (u/symbol? $test-1 "not"))
+    (when (and (u/list? $test)
+               (= 2 (count (:children $test)))
+               (u/symbol? $test-1 "not"))
       (api/reg-finding!
        (assoc (meta $if)
               :message (u/->msg node (str "(if-not " $test-2 " " $then " " $else ")"))
@@ -16,8 +17,11 @@
 
 (defn if->cond-> [{:keys [children] :as node}]
   (let [[$if $test $then $else] children
-        {[$then-1 $then-2 & $then-args] :children} $then]
-    (when (= (u/->sexpr $else) (u/->sexpr $then-2))
+        [$then-1 $then-2 & $then-args] (:children $then)]
+    (when (and
+           (u/list? $then)
+           (<= 2 (count (:children $then)))
+           (= (u/->sexpr $else) (u/->sexpr $then-2)))
       (api/reg-finding!
        (assoc (meta $if)
               :message (u/->msg node (str "(cond-> " $else " "
