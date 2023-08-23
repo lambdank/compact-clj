@@ -40,6 +40,22 @@
        (assoc (meta $let)
               :message (u/->msg node (str "(when-let " $bindings " " (str/join " " $body-args) ")"))
               :type :lol)))))
+
+(defn let->if-let [node]
+  (let [[$let $bindings $body] (:children node)
+        [$bindings-1] (:children $bindings)
+        [$if $predicate $then $else] (:children $body)]
+    (when (and (= 3 (count (:children node)))
+               (u/vector? $bindings)
+               (u/list? $body)
+               (= 2 (count (:children $bindings)))
+               (= 4 (count (:children $body)))
+               (= $bindings-1 $predicate)
+               (u/symbol? $if "if")
+               (not-any? #{$predicate} (:children $else)))
+      (api/reg-finding!
+       (assoc (meta $let)
+              :message (u/->msg node (str "(if-let " $bindings " " $then " " $else ")"))
               :type :lol)))))
 
 (defn all [{:keys [node]}]
