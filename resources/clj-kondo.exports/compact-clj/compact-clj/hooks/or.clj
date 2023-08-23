@@ -1,31 +1,40 @@
 (ns ^:no-doc hooks.or
   (:require
-   [clj-kondo.hooks-api :as api]
    [clojure.string :as str]
    [hooks.utils :as u]))
 
-(defn or->some [node]
-  (let [{[$or & $args] :children} node]
-    (when (and (pos? (count $args))
-               (every? (fn [{:keys [children]}] (= (count children) 2)) $args)
-               (apply = (map (comp u/->sexpr first :children) $args)))
-      (let [pred (-> $args first :children first)
-            args (map (comp second :children) $args)]
-        (api/reg-finding!
-         (merge (meta $or)
-                {:message (u/->msg node (str "(some " pred " [" (str/join " " args) "])"))
-                 :type :lol}))))))
+(defn- legal? [{:keys [children]}]
+  ;; `or` with one argument is already linted by clj-kondo.
+  (<= 2 (count children)))
 
-(defn or->get [node]
-  (let [{[$or $args-1 $args-2 & $args] :children} node
-        {[$args-1-1 $args-1-2] :children} $args-1]
-    (when (and (zero? (count $args))
-               (u/keyword? $args-1-1))
-      (api/reg-finding!
-         (merge (meta $or)
-                {:message (u/->msg node (str "(" $args-1-1 " " $args-1-2 " " $args-2 ")"))
-                 :type :lol})))))
+(defn or->some
+  "Compression: (or (f x) (f y)) -> (some f [x y])"
+  [{:keys [children] :as node}]
+  (let [[$or & $args] children
+        {[$pred] :children} (first $args)]
+    (when (and (every? #(and (u/list? %) (u/count? % 2)) $args)
+               (every? (fn [{[pred] :children}] (= pred $pred)) (rest $args)))
+      (u/reg-compression!
+       node
+       $or
+       (str "(some " $pred " [" (str/join " " (map (comp second :children) $args)) "])")))))
+
+(defn or->get
+  "Compression: ((or (get m k) x) -> (get m k x)"
+  [{:keys [children] :as node}]
+  (let [[$or $x $y] children]
+    (when (and (u/count? node 3)
+               (u/list? $x))
+      (cond (and (u/keyword? (first (:children $x)))
+                 (u/count? $x 2))
+            (let [[$kw $m] (:children $x)]
+              (u/reg-compression! node $or (str "(" $kw " " $m " " $y ")")))
+
+            (and (u/symbol? (first (:children $x)) "get")
+                 (u/count? $x 3))
+            (let [[_$get $m $k] (:children $x)]
+              (u/reg-compression! node $or (str "(get " $m " " $k " " $y ")")))))))
 
 (defn all [{:keys [node]}]
-  (when (u/in-source? node)
+  (when (and (u/in-source? node) (legal? node))
     ((juxt or->some or->get) node)))

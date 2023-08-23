@@ -23,6 +23,14 @@
             :end-row 1
             :col 2
             :end-col 4
-            :message "(:a x y)"
+            :message "(or (:a x) y) -shorten-> (:a x y)"
+            :type :lol}
+           (hooks.or/or->get (api/parse-string code)))))
+  (let [code "(or (get m k) x)"]
+    (is (= {:row 1
+            :end-row 1
+            :col 2
+            :end-col 4
+            :message "(or (get m k) x) -shorten-> (get m k x)"
             :type :lol}
            (hooks.or/or->get (api/parse-string code))))))
