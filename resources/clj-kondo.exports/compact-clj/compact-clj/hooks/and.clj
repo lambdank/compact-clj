@@ -1,31 +1,33 @@
 (ns ^:no-doc hooks.and
   (:require
-   [clj-kondo.hooks-api :as api]
    [clojure.string :as str]
    [hooks.utils :as u]))
 
-(defn and-remove-nested [{[_$and & $args] :children}]
-  (doall
-   (keep (fn [{[$1 & $1-args] :children :as $1-node}]
-           (when (u/symbol? $1 "and")
-             (api/reg-finding!
-              (merge (meta $1)
-                     {:message (u/->msg $1-node (str/join " " $1-args))
-                      :type :lol}))))
-         $args)))
+(defn- legal? [{:keys [children]}]
+  ;; `and` with one argument is already linted by clj-kondo.
+  (<= 2 (count children)))
 
-(defn and->every? [node]
-  (let [{[$and & $args] :children} node]
-    (when (and (pos? (count $args))
-               (every? (fn [{:keys [children]}] (= (count children) 2)) $args)
-               (apply = (map (comp u/->sexpr first :children) $args)))
-      (let [pred (-> $args first :children first)
-            args (map (comp second :children) $args)]
-        (api/reg-finding!
-         (merge (meta $and)
-                {:message (u/->msg node (str "(every? " pred " [" (str/join " " args) "])"))
-                 :type :lol}))))))
+(defn and-remove-nested
+  "Compression: (and (and x y) z) -> (and x y z)"
+  [{[_$and & $args] :children}]
+  (->> $args
+       (keep (fn [{[$nested-and & $nested-args] :children :as nested-and-node}]
+               (when (and (u/list? nested-and-node)
+                          (u/symbol? $nested-and "and")
+                          (<= 2 (count (:children nested-and-node))))
+                 (u/reg-compression! nested-and-node $nested-and (str/join " " $nested-args)))))
+       doall))
+
+(defn and->every?
+  "Compression: (and (f x) (f y)) -> (every? f [x y])"
+  [{[$and {[$pred $x] :children} & $args] :children :as node}]
+  (when (and (every? #(u/count? % 2) $args)
+             (every? #{$pred} (map (comp first :children) $args)))
+    (u/reg-compression!
+     node
+     $and
+     (str "(every? " $pred " [" $x " " (str/join " " (map (comp second :children) $args)) "])"))))
 
 (defn all [{:keys [node]}]
-  (when (u/in-source? node)
+  (when (and (u/in-source? node) (legal? node))
     ((juxt and-remove-nested and->every?) node)))
