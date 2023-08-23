@@ -28,10 +28,10 @@ You might need to ignore this in your git projects, if you are the only one usin
 
 ## `assoc`
 ```clojure
-;; assoc -> assoc-in
-(assoc {:a x, b {:c y}} :b (assoc (:b {:a x, b {:c y}}) :d z)) -> (assoc-in {:a x, b {:c y}} [:b :c] z)
 ;; remove nested assocs
-(assoc (assoc {} :a x) :b y) -> (assoc {} :a x :b y)
+(assoc (assoc m :a x) :b y) -> (assoc m :a x :b y)
+;; assoc -> assoc-in
+(assoc m :a (assoc (:a m) :b x)) -> (assoc-in m [:a :b] x)
 ```
 
 ## `conj`

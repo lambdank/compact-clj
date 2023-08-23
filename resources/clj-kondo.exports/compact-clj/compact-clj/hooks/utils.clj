@@ -6,6 +6,11 @@
 (defn ->msg [old new]
   (str old " -shorten-> " new))
 
+
+
+(defn map? [node]
+  (api/map-node? node))
+
 (defn list? [{:keys [tag]}]
   (= tag :list))
 
@@ -38,6 +43,11 @@
 
 (defn ->sexpr [node]
   (some-> node api/sexpr))
+
+(defn code= [& args]
+  (->> args
+       (map ->sexpr)
+       (apply =)))
 
 (defn in-source?
   "Detect whether the hook is in the source.
