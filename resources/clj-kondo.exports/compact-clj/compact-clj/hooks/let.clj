@@ -27,15 +27,19 @@
                 :type :lol))))))
 
 (defn let->when-let [node]
-  (let [{[$let $bindings $exprs] :children} node
-        {[$bindings-1 $bindings-2 & $rest] :children} $bindings
-        {[$when $test $body] :children} $exprs]
-    (when (and (u/symbol? $when "when")
-               (= (u/->sexpr $bindings-1) (u/->sexpr $test))
-               (empty? $rest))
+  (let [[$let $bindings $body] (:children node)
+        [$bindings-1] (:children $bindings)
+        [$body-1 $body-2 & $body-args] (:children $body)]
+    (when (and (= 3 (count (:children node)))
+               (u/vector? $bindings)
+               (= 2 (count (:children $bindings)))
+               (= $bindings-1 $body-2)
+               (u/list? $body)
+               (u/symbol? $body-1 "when"))
       (api/reg-finding!
        (assoc (meta $let)
-              :message (u/->msg node (str "(when-let [" $bindings-1 " " $bindings-2 "] " $body ")"))
+              :message (u/->msg node (str "(when-let " $bindings " " (str/join " " $body-args) ")"))
+              :type :lol)))))
               :type :lol)))))
 
 (defn all [{:keys [node]}]
