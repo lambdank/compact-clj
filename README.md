@@ -71,17 +71,17 @@ You might need to ignore this in your git projects, if you are the only one usin
 ## `if`
 ```clojure
 ;; if -> if-not
-(if (not x) y z) -> (if-not x y z)
+(if (not t) x y) -> (if-not t x y)
 ;; if -> when
-(if (p x) y nil) -> (when (p x) y)
+(if t x nil) -> (when t x)
 ;; if -> boolean
-(if (p x) true false) -> (boolean (p x))
+(if t true false) -> (boolean t)
 ;; if -> not
-(if (p x) false true) -> (not (p x))
+(if t false true) -> (not t)
 ;; if -> cond->
-(if (f x) (g x) x) -> (cond-> x (f x) (g))
+(if t (f x) x) -> (cond-> x t (f))
 ;; move if inside
-(if p (f x y) (f z y)) -> (f (if p x z) y)
+(if t (f x y) (f z y)) -> (f (if t x z) y)
 ```
 
 ## `into`
