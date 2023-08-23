@@ -2,7 +2,7 @@
 > There's no sense in being precise when you don't even know what you're talking about.
 > * John von Neumann
 
-A library that gives hints to shorten code, based on clj-kondo.
+A library that gives hints to shorten code, based on [clj-kondo](https://github.com/clj-kondo/clj-kondo).
 
 # Introduction
 Compact-clj is a rule-based code compressor. It uses clj-kondo hooks to attach rules to `clojure.core` functions. These rules hint at how to shorten the given code. 
