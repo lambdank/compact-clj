@@ -12,8 +12,17 @@
 (defn vector? [{:keys [tag]}]
   (= tag :vector))
 
+(defn reg-compression! [root-node highlight-node compression]
+  (api/reg-finding!
+   (assoc (meta highlight-node)
+          :message (->msg root-node compression)
+          :type :lol)))
+
 (defn set? [{:keys [tag]}]
   (= tag :set))
+
+(defn count? [{:keys [children]} size]
+  (= size (count children)))
 
 (defn symbol? [{:keys [string-value]} s]
   (= string-value s))
