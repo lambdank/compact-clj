@@ -44,10 +44,10 @@
 (defn if->cond-> [{:keys [children] :as node}]
   (let [[$if $test $then $else] children
         [$then-1 $then-2 & $then-args] (:children $then)]
-    (when (and
-           (u/list? $then)
-           (<= 2 (count (:children $then)))
-           (= (u/->sexpr $else) (u/->sexpr $then-2)))
+    (when (and (= 4 (count children))
+               (u/list? $then)
+               (<= 2 (count (:children $then)))
+               (= (u/->sexpr $else) (u/->sexpr $then-2)))
       (api/reg-finding!
        (assoc (meta $if)
               :message (u/->msg node (str "(cond-> " $else " "

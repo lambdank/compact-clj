@@ -48,12 +48,12 @@
            (hooks.if/if->not (api/parse-string code))))))
 
 (deftest if->cond->test
-  (let [code "(if (= a b) (inc a) a)"]
+  (let [code "(if (= a b) (+ a 2 3) a)"]
     (is (= {:row 1
             :end-row 1
             :col 2
             :end-col 4
-            :message "(if (= a b) (inc a) a) -shorten-> (cond-> a (= a b) (inc))"
+            :message "(if (= a b) (+ a 2 3) a) -shorten-> (cond-> a (= a b) (+ 2 3))"
             :type :lol}
            (hooks.if/if->cond-> (api/parse-string code)))))
   (let [code "(if (= 2 2) (f) nil)"]
