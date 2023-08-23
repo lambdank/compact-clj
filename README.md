@@ -119,15 +119,17 @@ You might need to ignore this in your git projects, if you are the only one usin
 ;; not -> not-every?
 (not (every? f coll)) -> (not-every? f coll)
 ;; not -> seq
-(not (empty? coll)) -shorten-> (seq coll)
+(not (empty? coll)) -> (seq coll)
 ;; not -> odd?
-(not (even? x)) -> (odd? x)
+(not (even? n)) -> (odd? n)
 ;; not -> even?
-(not (odd? x)) -> (even? x)
+(not (odd? n)) -> (even? n)
 ;; not -> true?
 (not (false? x)) -> (true? x)
 ;; not -> false?
 (not (true? x)) -> (false? x)
+;; not -> some?
+(not (nil? x)) -> (some? x)
 ;; not -> empty?
 (not (seq coll)) -> (empty? coll)
 ```

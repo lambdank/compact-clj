@@ -1,103 +1,123 @@
 (ns ^:no-doc hooks.not
   (:require
-   [clj-kondo.hooks-api :as api]
    [clojure.string :as str]
    [hooks.utils :as u]))
 
-(defn not->not= [{:keys [children] :as node}]
-  (let [[$not $1] children
-        [$1-1 & $1-args] (:children $1)]
-    (when (and (u/list? $1) (u/symbol? $1-1 "="))
-      (api/reg-finding!
-       (assoc (meta $not)
-              :message (u/->msg node (str "(not= " (str/join " " $1-args) ")"))
-              :type :lol)))))
+(defn- legal? [node]
+  (u/count? node 2))
 
-(defn not->not-any? [{:keys [children] :as node}]
-  (let [[$not $1] children
-        [$1-1 $1-2 & $1-args] (:children $1)]
-    (when (and (u/list? $1) (u/symbol? $1-1 "some"))
-      (api/reg-finding!
-       (assoc (meta $not)
-              :message (u/->msg
-                        node
-                        (str "(not-any? " $1-2 " " (str/join " " $1-args) ")"))
-              :type :lol)))))
+(defn not->not=
+  "Compression: (not (= x y)) -> (not= x y)"
+  [{:keys [children] :as node}]
+  (let [[$not $x] children
+        [$= & $=-args] (:children $x)]
+    (when (and (u/list? $x)
+               (u/symbol? $= "=")
+               (seq $=-args))
+      (u/reg-compression! node $not (str "(not= " (str/join " " $=-args) ")")))))
 
-(defn not->boolean [{:keys [children] :as node}]
-  (let [[$not {[$1-1 $1-2] :children}] children]
-    (when (u/symbol? $1-1 "not")
-      (api/reg-finding!
-       (assoc (meta $not)
-              :message (u/->msg node (str "(boolean " $1-2 ")"))
-              :type :lol)))))
+(defn not->not-any?
+  "Compression: (not (some f coll)) -> (not-any? f coll) "
+  [{:keys [children] :as node}]
+  (let [[$not $x] children
+        [$some $pred $coll] (:children $x)]
+    (when (and (u/list? $x)
+               (u/count? $x 3)
+               (u/symbol? $some "some"))
+      (u/reg-compression! node $not (str "(not-any? " $pred " " $coll ")")))))
 
-(defn not->not-every? [{:keys [children] :as node}]
-  (let [[$not {[$1-1 $pred $coll] :children}] children]
-    (when (u/symbol? $1-1 "every?")
-      (api/reg-finding!
-       (assoc (meta $not)
-              :message (u/->msg node (str "(not-every? " $pred " " $coll ")"))
-              :type :lol)))))
+(defn not->boolean
+  "Compression: (not (not x)) -> (boolean x)"
+  [{:keys [children] :as node}]
+  (let [[$not $x] children
+        [$x-not $x-x] (:children $x)]
+    (when (and (u/list? $x)
+               (u/count? $x 2)
+               (u/symbol? $x-not "not"))
+      (u/reg-compression! node $not (str "(boolean " $x-x ")")))))
 
-(defn not->seq [{:keys [children] :as node}]
-  (let [[$not {[$1-1 $coll] :children}] children]
-    (when (u/symbol? $1-1 "empty?")
-      (api/reg-finding!
-       (assoc (meta $not)
-              :message (u/->msg node (str "(seq " $coll ")"))
-              :type :lol)))))
+(defn not->not-every?
+  "Compression: (not (every? pred coll)) -> (not-every? pred coll)"
+  [{:keys [children] :as node}]
+  (let [[$not $x] children
+        [$every? $pred $coll] (:children $x)]
+    (when (and (u/list? $x)
+               (u/count? $x 3)
+               (u/symbol? $every? "every?"))
+      (u/reg-compression! node $not (str "(not-every? " $pred " " $coll ")")))))
 
-(defn not->even? [{:keys [children] :as node}]
-  (let [[$not {[$1-1 $n] :children}] children]
-    (when (u/symbol? $1-1 "odd?")
-      (api/reg-finding!
-       (assoc (meta $not)
-              :message (u/->msg node (str "(even? " $n ")"))
-              :type :lol)))))
+(defn not->seq
+  "Compression: (not (empty? coll)) -> (seq coll)"
+  [{:keys [children] :as node}]
+  (let [[$not $x] children
+        [$empty? $coll] (:children $x)]
+    (when (and (u/list? $x)
+               (u/count? $x 2)
+               (u/symbol? $empty? "empty?"))
+      (u/reg-compression! node $not (str "(seq " $coll ")")))))
 
-(defn not->odd? [{:keys [children] :as node}]
-  (let [[$not {[$1-1 $n] :children}] children]
-    (when (u/symbol? $1-1 "even?")
-      (api/reg-finding!
-       (assoc (meta $not)
-              :message (u/->msg node (str "(odd? " $n ")"))
-              :type :lol)))))
+(defn not->even?
+  "Compression: (not (odd? n)) -> (even? n)"
+  [{:keys [children] :as node}]
+  (let [[$not $x] children
+        [$odd? $n] (:children $x)]
+    (when (and (u/list? $x)
+               (u/count? $x 2)
+               (u/symbol? $odd? "odd?"))
+      (u/reg-compression! node $not (str "(even? " $n ")")))))
 
-(defn not->true? [{:keys [children] :as node}]
-  (let [[$not {[$1-1 $x] :children}] children]
-    (when (u/symbol? $1-1 "false?")
-      (api/reg-finding!
-       (assoc (meta $not)
-              :message (u/->msg node (str "(true? " $x ")"))
-              :type :lol)))))
+(defn not->odd?
+  "Compression: (not (even? n)) -> (odd? n)"
+  [{:keys [children] :as node}]
+  (let [[$not $x] children
+        [$even? $n] (:children $x)]
+    (when (and (u/list? $x)
+               (u/count? $x 2)
+               (u/symbol? $even? "even?"))
+      (u/reg-compression! node $not (str "(odd? " $n ")")))))
 
-(defn not->false? [{:keys [children] :as node}]
-  (let [[$not {[$1-1 $x] :children}] children]
-    (when (u/symbol? $1-1 "true?")
-      (api/reg-finding!
-       (assoc (meta $not)
-              :message (u/->msg node (str "(false? " $x ")"))
-              :type :lol)))))
+(defn not->true?
+  "Compression: (not (true? x)) -> (false? x)"
+  [{:keys [children] :as node}]
+  (let [[$not $x] children
+        [$false? $x-x] (:children $x)]
+    (when (and (u/list? $x)
+               (u/count? $x 2)
+               (u/symbol? $false? "false?"))
+      (u/reg-compression! node $not (str "(true? " $x-x ")")))))
 
-(defn not->some? [{:keys [children] :as node}]
-  (let [[$not {[$1-1 $1-2] :children}] children]
-    (when (u/symbol? $1-1 "nil?")
-      (api/reg-finding!
-       (assoc (meta $not)
-              :message (u/->msg node (str "(some? " $1-2 ")"))
-              :type :lol)))))
+(defn not->false?
+  "Compression: (not (false? x)) -> (true? x)"
+  [{:keys [children] :as node}]
+  (let [[$not $x] children
+        [$true? $x-x] (:children $x)]
+    (when (and (u/list? $x)
+               (u/count? $x 2)
+               (u/symbol? $true? "true?"))
+      (u/reg-compression! node $not (str "(false? " $x-x ")")))))
 
-(defn not->empty? [{:keys [children] :as node}]
-  (let [[$not {[$1-1 $1-2] :children}] children]
-    (when (u/symbol? $1-1 "seq")
-      (api/reg-finding!
-       (assoc (meta $not)
-              :message (u/->msg node (str "(empty? " $1-2 ")"))
-              :type :lol)))))
+(defn not->some?
+  "Compression: (not (nil? x)) -> (some? x)"
+  [{:keys [children] :as node}]
+  (let [[$not $x] children
+        [$nil? $x-x] (:children $x)]
+    (when (and (u/list? $x)
+               (u/count? $x 2)
+               (u/symbol? $nil? "nil?"))
+      (u/reg-compression! node $not (str "(some? " $x-x ")")))))
+
+(defn not->empty?
+  "Compression: (not (seq coll)) -> (empty? coll)"
+  [{:keys [children] :as node}]
+  (let [[$not $x] children
+        [$seq $coll] (:children $x)]
+    (when (and (u/list? $x)
+               (u/count? $x 2)
+               (u/symbol? $seq "seq"))
+      (u/reg-compression! node $not (str "(empty? " $coll ")")))))
 
 (defn all [{:keys [node]}]
-  (when (u/in-source? node)
+  (when (and (u/in-source? node) (legal? node))
     ((juxt not->not= not->not-any? not->boolean not->not-every?
            not->seq not->even? not->odd? not->true? not->false?
            not->some? not->empty?) node)))
