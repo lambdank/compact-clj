@@ -1,40 +1,43 @@
 (ns ^:no-doc hooks.eq
   (:require
-   [clj-kondo.hooks-api :as api]
    [hooks.utils :as u]))
 
-(defn =->true? [node]
-  (let [children (:children node)
-        [$= $1 $2] children
-        finding #(merge (meta $=)
-                        {:message (u/->msg node (str "(true? " % ")"))
-                         :type :lol})]
-    (when (= (count children) 3)
-      (cond (u/symbol? $1 "true") (api/reg-finding! (finding $2))
-            (u/symbol? $2 "true") (api/reg-finding! (finding $1))))))
+(defn- legal? [node]
+  (pos? (count (:children node))))
 
-(defn =->nil? [node]
-  (let [children (:children node)
-        [$= $1 $2] children
-        finding #(merge (meta $=)
-                        {:message (u/->msg node (str "(nil? " % ")"))
-                         :type :lol})]
-    (when (= (count children) 3)
-      (cond (u/symbol? $1 "nil") (api/reg-finding! (finding $2))
-            (u/symbol? $2 "nil") (api/reg-finding! (finding $1))))))
+(defn =->true?
+  "Compression: (= x true) -> (true? x)"
+  [{:keys [children] :as node}]
+  (let [[$= $x $y] children]
+    (when (u/count? node 3)
+      (cond (u/symbol? $x "true") (u/reg-compression! node $= (str "(true? " $y ")"))
+            (u/symbol? $y "true") (u/reg-compression! node $= (str "(true? " $x ")"))))))
 
-(defn =->empty? [node]
-  (let [children (:children node)
-        [$= $1 $2] children
-        {[$1-1 $1-2] :children} $1
-        {[$2-1 $2-2] :children} $2
-        finding #(merge (meta $=)
-                        {:message (u/->msg node (str "(empty? " % ")"))
-                         :type :lol})]
-    (when (= (count children) 3)
-      (cond (and (u/symbol? $1 "0") (u/symbol? $2-1 "count")) (api/reg-finding! (finding $2-2))
-            (and (u/symbol? $1-1 "count") (u/symbol? $2 "0")) (api/reg-finding! (finding $1-2))))))
+(defn =->nil?
+  "Compression: (= x nil) -> (nil? x)"
+  [{:keys [children] :as node}]
+  (let [[$= $x $y] children]
+    (when (u/count? node 3)
+      (cond (u/symbol? $x "nil") (u/reg-compression! node $= (str "(nil? " $y ")"))
+            (u/symbol? $y "nil") (u/reg-compression! node $= (str "(nil? " $x ")"))))))
+
+(defn =->empty?
+  "Compression: (= 0 (count coll)) -> (empty? coll)"
+  [{:keys [children] :as node}]
+  (let [[$= $x $y] children
+        [$x-count $x-coll] (:children $x)
+        [$y-count $y-coll] (:children $y)]
+    (when (u/count? node 3)
+      (cond (and (u/symbol? $x "0")
+                 (u/list? $y)
+                 (u/symbol? $y-count "count"))
+            (u/reg-compression! node $= (str "(empty? " $y-coll ")"))
+
+            (and (u/symbol? $y "0")
+                 (u/list? $x)
+                 (u/symbol? $x-count "count"))
+            (u/reg-compression! node $= (str "(empty? " $x-coll ")"))))))
 
 (defn all [{:keys [node]}]
-  (when (u/in-source? node)
+  (when (and (u/in-source? node) (legal? node))
     ((juxt =->true? =->nil? =->empty?) node)))
