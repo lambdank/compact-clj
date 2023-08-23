@@ -4,60 +4,52 @@
    [clojure.string :as str]
    [hooks.utils :as u]))
 
-(defn let->doto [node]
-  (let [{[$let $bindings & $exprs] :children} node
-        {[$var $value] :children} $bindings
-        $vexprs (into [] $exprs)
-        $var-sexpr (u/->sexpr $var)]
-    (when (and (-> $bindings :children count (= 2))
-               (= (u/->sexpr (peek $vexprs))
-                  (u/->sexpr (first (:children $bindings))))
-               (every? (fn [{:keys [children]}]
-                         (= (u/->sexpr (second children)) $var-sexpr))
-                       (drop-last $vexprs)))
-      (println (drop-last $vexprs))
-      (let [remove-var (fn [children] (keep-indexed #(when-not (= 1 %1) %2) children))
-            exprs-without-var (->> $vexprs
-                                   drop-last
-                                   (map (fn [expr] (update expr :children remove-var))))]
-        (api/reg-finding!
-         (assoc (meta $let)
-                :message (u/->msg node (str "(doto " $value " "
-                                            (str/join " " exprs-without-var) ")"))
-                :type :lol))))))
+(defn legal? [{:keys [children]}]
+  (let [[_$let $bindings & $exprs] children]
+    (and (seq $exprs) (u/vector? $bindings))))
 
-(defn let->when-let [node]
-  (let [[$let $bindings $body] (:children node)
-        [$bindings-1] (:children $bindings)
-        [$body-1 $body-2 & $body-args] (:children $body)]
-    (when (and (= 3 (count (:children node)))
-               (u/vector? $bindings)
-               (= 2 (count (:children $bindings)))
-               (= $bindings-1 $body-2)
-               (u/list? $body)
-               (u/symbol? $body-1 "when"))
-      (api/reg-finding!
-       (assoc (meta $let)
-              :message (u/->msg node (str "(when-let " $bindings " " (str/join " " $body-args) ")"))
-              :type :lol)))))
+(defn let->doto
+  "Compression: (let [x y] (f x) (g x) x) -> (doto y (f) (g))"
+  [{:keys [children] :as node}]
+  (let [[$let $bindings & $exprs] children
+        [$key $value] (:children $bindings)
+        exprs-wihout-last (drop-last $exprs)]
+    (when (and (u/count? $bindings 2)
+               (= (last $exprs) $key)
+               (every? #(= (second (:children %)) $key) exprs-wihout-last))
+      (let [modified-exprs (map #(update % :children (fn [[$f _$key & $args]]
+                                                       (into (list $f) $args)))
+                                exprs-wihout-last)]
+        (u/reg-compression! node $let (str "(doto " $value " " (str/join " " modified-exprs) ")"))))))
 
-(defn let->if-let [node]
-  (let [[$let $bindings $body] (:children node)
-        [$bindings-1] (:children $bindings)
-        [$if $predicate $then $else] (:children $body)]
-    (when (and (= 3 (count (:children node)))
-               (u/vector? $bindings)
-               (u/list? $body)
-               (= 2 (count (:children $bindings)))
-               (= 4 (count (:children $body)))
-               (= $bindings-1 $predicate)
+(defn let->when-let
+  "Compression: (let [x y] (when x (f x)) -> (when-let [x y] (f x))"
+  [{:keys [children] :as node}]
+  (let [[$let $bindings $exprs] children
+        [$key] (:children $bindings)
+        [$when $test & $body] (:children $exprs)]
+    (when (and (u/count? node 3)
+               (u/count? $bindings 2)
+               (u/list? $exprs)
+               (u/symbol? $when "when")
+               (= $key $test))
+      (u/reg-compression! node $let (str "(when-let " $bindings " " (str/join " " $body) ")")))))
+
+(defn let->if-let
+  "Compression: (let [x y] (if x (f x) z) -> (if-let [x y] (f x) z)"
+  [{:keys [children] :as node}]
+  (let [[$let $bindings $exprs] children
+        [$key] (:children $bindings)
+        [$if $predicate $then $else] (:children $exprs)]
+    (when (and (u/count? node 3)
+               (u/count? $bindings 2)
+               (u/list? $exprs)
+               (u/count? $exprs 4)
+               (= $key $predicate)
                (u/symbol? $if "if")
                (not-any? #{$predicate} (:children $else)))
-      (api/reg-finding!
-       (assoc (meta $let)
-              :message (u/->msg node (str "(if-let " $bindings " " $then " " $else ")"))
-              :type :lol)))))
+      (u/reg-compression! node $let (str "(if-let " $bindings " " $then " " $else ")")))))
 
 (defn all [{:keys [node]}]
-  (when (u/in-source? node)
+  (when (and (u/in-source? node) (legal? node))
     ((juxt let->doto let->when-let) node)))
