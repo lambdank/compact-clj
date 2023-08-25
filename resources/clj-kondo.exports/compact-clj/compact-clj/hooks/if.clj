@@ -73,6 +73,13 @@
                   " (if " $test " " t " " e ") "
                   (str/join " " (drop (inc i) $then-args)) ")"))))))))
 
+(defn if->or
+  "Compression: (if x x y) -> (or x y)"
+  [{:keys [children] :as node}]
+  (let [[$if $test $then $else] children]
+    (when (u/code= $test $then)
+      (u/reg-compression! node $if (str "(or " $then " " $else ")")))))
+
 (defn all [{:keys [node]}]
   (when (and (u/in-source? node) (legal? node))
-    ((juxt if->if-not if->when if->boolean if->not if->cond-> if-move-to-inner) node)))
+    ((juxt if->if-not if->when if->boolean if->not if->cond-> if-move-to-inner if->or) node)))

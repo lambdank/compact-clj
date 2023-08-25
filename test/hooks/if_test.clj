@@ -68,3 +68,13 @@
             :message "(if (= a b) (f x a y) (f x b y)) -shorten-> (f x (if (= a b) a b) y)"
             :type :lol}
            (hooks.if/if-move-to-inner (api/parse-string code))))))
+
+(deftest if->or
+  (let [code "(if x x y)"]
+    (is (= {:row 1
+            :end-row 1
+            :col 2
+            :end-col 4
+            :message "(if x x y) -shorten-> (or x y)"
+            :type :lol}
+           (hooks.if/if->or (api/parse-string code))))))

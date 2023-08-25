@@ -81,6 +81,8 @@ You might need to ignore this in your git projects, if you are the only one usin
 (if t (f x) x) -> (cond-> x t (f))
 ;; move if inside
 (if t (f x y) (f z y)) -> (f (if t x z) y)
+;; if -> or
+(if x x y) -> (or x y)
 ```
 
 ## `into`
