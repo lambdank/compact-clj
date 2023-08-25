@@ -2,11 +2,11 @@
   (:require
    [clj-kondo.hooks-api :as api]))
 
-
 (defn ->msg [old new]
   (str old " -shorten-> " new))
 
-
+(defn fn? [n]
+  (instance? clj_kondo.impl.rewrite_clj.node.fn.FnNode n))
 
 (defn map? [node]
   (api/map-node? node))
