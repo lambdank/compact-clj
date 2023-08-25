@@ -4,14 +4,12 @@
    [hooks.utils :as u]))
 
 (defn- legal? [{:keys [children]}]
-  ((every-pred [even?] #(<= 4 %)) (count children)))
+  ((every-pred even? #(<= 4 %)) (count children)))
 
 (defn assoc-remove-nested
   "Compression: (assoc (assoc m :a x) :b y) -> (assoc m :a x :b y)"
   [{[$assoc $m & $kvs] :children :as node}]
   (let [{[$nested-assoc $nested-m & $nested-kvs] :children} $m]
-    (tap> $kvs)
-    (tap> $nested-kvs)
     (when (and (u/list? $m)
                (u/symbol? $nested-assoc "assoc")
                (even? (count $nested-kvs)))
