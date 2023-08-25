@@ -145,6 +145,8 @@ You might need to ignore this in your git projects, if you are the only one usin
 ```clojure
 ;; vec -> mapv
 (vec (map f coll)) -> (mapv f coll)
+;; vec -> filterv
+(vec (filter pred coll)) -> (filterv pred coll)"
 ```
 
 ## `when`

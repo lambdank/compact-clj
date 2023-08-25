@@ -4,26 +4,27 @@
    [clojure.string :as str]
    [hooks.utils :as u]))
 
-(defn vec->mapv [node]
-  (let [children (:children node)
-        [$vec $1] children
-        [$map $f & $colls] (:children $1)]
-    (when (and (= (count children) 2)
-               (u/symbol? $map "map"))
-      (api/reg-finding! (merge (meta $vec)
-                               {:message (u/->msg node (str "(mapv " $f " " (str/join " " $colls) ")"))
-                                :type :lol})))))
+(defn- legal? [node]
+  (u/count? node 2))
 
-(defn vec->filterv [node]
-  (let [children (:children node)
-        [$vec $1] children
-        [$filter $pred $coll] (:children $1)]
-    (when (and (= (count children) 2)
+(defn vec->mapv
+  "Compression: (vec (map f coll)) -> (mapv f coll)"
+  [{:keys [children] :as node}]
+  (let [[$vec $coll] children
+        [$map $f & $colls] (:children $coll)]
+    (when (and (seq $colls)
+               (u/symbol? $map "map"))
+      (u/reg-compression! node $vec (str "(mapv " $f " " (str/join " " $colls) ")")))))
+
+(defn vec->filterv
+  "Compression: (vec (filter pred coll)) -> (filterv pred coll)"
+  [{:keys [children] :as node}]
+  (let [[$vec $coll] children
+        [$filter $pred $nested-coll] (:children $coll)]
+    (when (and (u/count? $coll 3)
                (u/symbol? $filter "filter"))
-      (api/reg-finding! (merge (meta $vec)
-                               {:message (u/->msg node (str "(filterv " $pred " " $coll ")"))
-                                :type :lol})))))
+      (u/reg-compression! node $vec (str "(filterv " $pred " " $nested-coll ")")))))
 
 (defn all [{:keys [node]}]
-  (when (u/in-source? node)
+  (when (and (u/in-source? node) (legal? node))
     (vec->mapv node)))
