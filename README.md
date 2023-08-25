@@ -56,7 +56,7 @@ You might need to ignore this in your git projects, if you are the only one usin
 (filter (complement f) coll) -> (remove f coll)
 (filter #(not (f %)) coll) -> (remove f coll)
 ;; filter -> keep
-(filter identity (map f coll)) -> (keep f coll) 
+(filter some? (map f coll)) -> (keep f coll) 
 ```
 
 ## `first`

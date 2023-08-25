@@ -1,36 +1,58 @@
 (ns ^:no-doc hooks.filter
   (:require
-   [clj-kondo.hooks-api :as api]
    [hooks.utils :as u]))
 
-(defn filter->remove [{:keys [children] :as node}]
+(defn- legal? [node]
+  (u/count? node 3))
+
+(defn filter->remove
+  "Compression: (filter #(not (f %)) coll) -> (remove f coll)"
+  [{:keys [children] :as node}]
   (let [[$filter $pred $coll] children
-        {[$pred-1 $pred-2 $pred-3] :children} $pred
-        {[$pred-3-1 $pred-3-2] :children} $pred-3]
+        {[$pred-1 $pred-2 $pred-3] :children} $pred]
     (cond
-      (u/symbol? $pred-1 "complement")
-      (api/reg-finding!
-       (assoc (meta $filter)
-              :message (u/->msg node (str "(remove " $pred-2 " " $coll ")"))
-              :type :lol))
+      ;; (filter (complent pred) coll) -> (remove pred coll)
+      (and (u/list? $pred)
+           (u/symbol? $pred-1 "complement")
+           (u/count? $pred 2))
+      (u/reg-compression! node $filter (str "(remove " $pred-2 " " $coll ")"))
 
-      (and (u/symbol? $pred-1 "fn") (u/symbol? $pred-3-1 "not"))
-      (api/reg-finding!
-       (assoc (meta $filter)
-              :message (u/->msg node (str "(remove (fn " $pred-2 " " $pred-3-2 ") " $coll ")"))
-              :type :lol)))))
+      ;; (filter #(not (pred %)) coll) -> (remove #(pred %) coll)
+      (and (u/fn? $pred)
+           (u/count? $pred 2)
+           (u/symbol? $pred-1 "not")
+           (u/list? $pred-2)
+           (not (u/empty? $pred-2)))
+      (u/reg-compression!
+       node
+       $filter
+       (str "(remove #" $pred-2 " " $coll ")"))
 
-(defn filter->keep [{:keys [children] :as node}]
+      ;; (filter (fn [x] (not (pred x))) coll) -> (remove (fn [x] (pred x))) coll)
+      (and (u/list? $pred)
+           (u/symbol? $pred-1 "fn")
+           (u/count? $pred 3)
+           (u/list? $pred-3)
+           (u/symbol? (first (:children $pred-3)) "not")
+           (u/count? $pred-3 2))
+      (u/reg-compression!
+       node
+       $filter
+       (str "(remove (fn " $pred-2 " " (second (:children $pred-3)) ") " $coll ")")))))
+
+(defn filter->keep
+  "Compression: (filter some? (map f coll)) -> (keep f coll)"
+  [{:keys [children] :as node}]
   (let [[$filter $pred $coll] children
-        {[$coll-1 $coll-2 $coll-3 & $coll-args] :children} $coll]
-    (when (and (u/symbol? $pred "identity")
-               (u/symbol? $coll-1 "map")
-               (empty? $coll-args))
-      (api/reg-finding!
-       (assoc (meta $filter)
-              :message (u/->msg node (str "(keep " $coll-2 " " $coll-3 ")"))
-              :type :lol)))))
+        {[$map $f & $colls] :children} $coll]
+    (when (and (u/symbol? $pred "some?")
+               (u/symbol? $map "map")
+               (= 1 (count $colls)))
+      (u/reg-compression!
+       node
+       $filter
+       (str "(keep " $f " " (first $colls) ")")))))
 
 (defn all [{:keys [node]}]
-  (when (u/in-source? node)
+  (when (and (u/in-source? node) (legal? node))
     ((juxt filter->remove filter->keep) node)))
