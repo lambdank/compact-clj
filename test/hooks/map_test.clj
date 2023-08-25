@@ -2,7 +2,7 @@
   (:require
    [clj-kondo.hooks-api :as api]
    [clojure.test :refer [deftest use-fixtures is]]
-   [hooks.eq]
+   [hooks.map]
    [hooks.test-utils :refer [mock-reg-finding]]))
 
 (use-fixtures :once mock-reg-finding)

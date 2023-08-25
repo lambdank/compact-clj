@@ -1,19 +1,19 @@
 (ns ^:no-doc hooks.map
   (:require
-   [clj-kondo.hooks-api :as api]
    [hooks.utils :as u]))
 
-(defn map-remove-nested [{:keys [children] :as node}]
+(defn- legal? [node]
+  (u/count? node 3))
+
+(defn map-remove-nested
+  "Compression: (map f (map g coll)) -shorten-> (map (comp f g) coll)"
+  [{:keys [children] :as node}]
   (let [[$map $f $coll] children
-        $coll-children (:children $coll)
-        [$coll-1 $coll-2 $coll-3] $coll-children]
-    (when (and (= (count children) (count $coll-children) 3)
-               (u/symbol? $coll-1 "map"))
-      (api/reg-finding!
-       (merge (meta $map)
-              {:message (u/->msg node (str "(map (comp " $f " " $coll-2 ") " $coll-3 ")"))
-               :type :lol})))))
+        [$nested-map $nested-f $nested-coll] (:children $coll)]
+    (when (and (u/symbol? $nested-map "map")
+               (u/count? $coll 3))
+      (u/reg-compression! node $map (str "(map (comp " $f " " $nested-f ") " $nested-coll ")")))))
 
 (defn all [{:keys [node]}]
-  (when (u/in-source? node)
+  (when (and (u/in-source? node) (legal? node))
     (map-remove-nested node)))
