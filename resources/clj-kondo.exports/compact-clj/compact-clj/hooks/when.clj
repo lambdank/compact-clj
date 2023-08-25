@@ -1,29 +1,33 @@
 (ns ^:no-doc hooks.when
   (:require
-   [clj-kondo.hooks-api :as api]
    [clojure.string :as str]
    [hooks.utils :as u]))
 
-(defn when->when-not [node]
-  (let [{[$when $test & $body] :children} node
-        {[$test-1 $test-2] :children} $test]
-    (when (u/symbol? $test-1 "not")
-      (api/reg-finding!
-       (assoc (meta $when)
-              :message (u/->msg node (str "(when-not " $test-2 " " (str/join " " $body) ")"))
-              :type :lol)))))
+(defn- legal? [{:keys [children]}]
+  (< 2 (count children)))
 
-(defn when->not-empty [node]
-  (let [{[$when $test & $body] :children} node
-        {[$test-1 $test-2] :children} $test]
+(defn when->when-not
+  "Compression: (when (not x) body) -> (when-not x body)"
+  [{:keys [children] :as node}]
+  (let [[$when $test & $body] children
+        [$not $x] (:children $test)]
+    (when (and (u/list? $test)
+               (u/symbol? $not "not")
+               (u/count? $test 2))
+      (u/reg-compression! node $when (str "(when-not " $x " " (str/join " " $body) ")")))))
+
+(defn when->not-empty
+  "Compression: (when (seq coll) coll) -> (not-empty coll)"
+  [{:keys [children] :as node}]
+  (let [[$when $test & $body] children
+        [$seq $coll] (:children $test)]
     (when (and (= (count $body) 1)
-               (u/symbol? $test-1 "seq")
-               (= (u/->sexpr $test-2) (u/->sexpr (first $body))))
-      (api/reg-finding!
-       (assoc (meta $when)
-              :message (u/->msg node (str "(not-empty " $test-2")"))
-              :type :lol)))))
+               (u/list? $test)
+               (u/symbol? $seq "seq")
+               (u/count? $test 2)
+               (u/code= (first $body) $coll))
+      (u/reg-compression! node $when (str "(not-empty " $coll")")))))
 
 (defn all [{:keys [node]}]
-  (when (u/in-source? node)
+  (when (and (u/in-source? node) (legal? node))
     ((juxt when->not-empty when->when-not) node)))
