@@ -6,7 +6,9 @@
   (str old " -shorten-> " new))
 
 (defn fn? [n]
-  (instance? clj_kondo.impl.rewrite_clj.node.fn.FnNode n))
+  ;; This throws a "Could not resolve symbol: clj_kondo.impl.rewrite_clj.node.fn.FnNode"
+  #_(instance? clj_kondo.impl.rewrite_clj.node.fn.FnNode n)
+  (= "class clj_kondo.impl.rewrite_clj.node.fn.FnNode" (str (class n))))
 
 (defn map? [node]
   (api/map-node? node))
