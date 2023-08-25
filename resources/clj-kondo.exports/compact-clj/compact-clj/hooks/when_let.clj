@@ -1,20 +1,28 @@
 (ns ^:no-doc hooks.when-let
   (:require
-   [clj-kondo.hooks-api :as api]
    [clojure.string :as str]
    [hooks.utils :as u]))
 
-(defn when-let->when-first [node]
-  (let [{[$when-let $bindings & $body] :children} node
-        {[$bindings-1 $bindings-2 & $bindings-rest] :children} $bindings
-        {[$first $coll] :children} $bindings-2]
-    (when (and (empty? $bindings-rest)
-               (u/symbol? $first "first"))
-      (api/reg-finding!
-       (assoc (meta $when-let)
-              :message (u/->msg node (str "(when-first [" $bindings-1 " " $coll "] " (str/join " " $body)")"))
-              :type :lol)))))
+(defn- legal? [{:keys [children]}]
+  (let [[_$let $bindings & $body] children]
+    (and (seq $body) (u/vector? $bindings) (even? (count (:children $bindings))))))
 
-(defn all [{:keys [node]}]
-  (when (u/in-source? node)
+(defn when-let->when-first
+  "Compression: (when-let [x (first xs)] (f x)) -> (when-first [x xs] (f x))"
+  [{:keys [children] :as node}]
+  (let [[$when-let $bindings & $body] children
+        {[$key $value] :children} $bindings
+        {[$first $coll] :children} $value]
+    (when (and (u/count? $bindings 2)
+               (u/vector? $bindings)
+               (u/list? $value)
+               (u/count? $value 2)
+               (u/symbol? $first "first"))
+      (u/reg-compression!
+       node
+       $when-let
+       (str "(when-first [" $key " " $coll "] " (str/join " " $body)")")))))
+
+(defn all [{:keys [node] :as kappa}]
+  (when (and (u/in-source? node) (legal? node))
     (when-let->when-first node)))
