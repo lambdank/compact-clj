@@ -1,29 +1,31 @@
 (ns ^:no-doc hooks.first
   (:require
-   [clj-kondo.hooks-api :as api]
    [hooks.utils :as u]))
 
-(defn first->ffirst [node]
-  (let [children (:children node)
-        [$first $1] children
-        [$first-first $coll] (:children $1)]
-    (when (and (= (count children) 2)
-               (u/symbol? $first-first "first"))
-      (api/reg-finding! (merge (meta $first)
-                               {:message (u/->msg node (str "(ffirst " $coll  ")"))
-                                :type :lol})))))
+(defn- legal? [node]
+  (u/count? node 2))
 
-(defn first->second [node]
-  (let [children (:children node)
-        [$first $1] children
-        [$next $coll] (:children $1)]
-    (when (and (= (count children) 2)
-               (u/symbol? $next "next"))
-      (api/reg-finding! (merge (meta $first)
-                               {:message (u/->msg node (str "(second " $coll  ")"))
-                                :type :lol})))))
+(defn first->ffirst
+  "Compression: (first (first coll)) -> (ffirst coll)"
+  [{:keys [children] :as node}]
+  (let [[$first {[$nested-first $nested-coll] :children :as $coll}] children]
+    (when (and (u/count? node 2)
+               (u/list? $coll)
+               (u/symbol? $nested-first "first")
+               (u/count? $coll 2))
+      (u/reg-compression! node $first (str "(ffirst " $nested-coll ")")))))
+
+(defn first->second
+  "Compression: (first (next coll)) -> (second coll)"
+  [{:keys [children] :as node}]
+  (let [[$first {[$next $nested-coll] :children :as $coll}] children]
+    (when (and (u/count? node 2)
+               (u/list? $coll)
+               (u/symbol? $next "next")
+               (u/count? $coll 2))
+      (u/reg-compression! node $first (str "(second " $nested-coll  ")")))))
 
 (defn all [{:keys [node]}]
-  (when (u/in-source? node)
+  (when (and (u/in-source? node) (legal? node))
     ((juxt first->ffirst first->second) node)))
 
