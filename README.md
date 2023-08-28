@@ -18,6 +18,27 @@ The easiest way to get started is to add this project to your `~/.clojure/deps.e
 You might need to ignore this in your git projects, if you are the only one using it.
 
 # Rules
+
+## `=`
+```clojure
+;; = -> true?
+(= x true) -> (true? x)
+;; = -> nil?
+(= x nil) -> (nil? x)
+;; = -> empty?
+(= 0 (count coll)) -> (empty? coll)
+```
+
+## `+`
+```clojure
+;; remove nested ands
+(+ (+ x y) z) -> (+ x y z)
+;; + -> inc
+(+ n 1) -> (inc n)
+;; + -> dec
+(+ n -1) -> (dec n)
+```
+
 ## `and`
 ```clojure
 ;; remove nested ands
@@ -38,16 +59,6 @@ You might need to ignore this in your git projects, if you are the only one usin
 ```clojure
 ;; remove nested conjs
 (conj (conj coll x) y) -> (conj coll x y)
-```
-
-## `=`
-```clojure
-;; = -> true?
-(= x true) -> (true? x)
-;; = -> nil?
-(= x nil) -> (nil? x) 
-;; = -> empty?
-(= 0 (count coll)) -> (empty? coll)
 ```
 
 ## `filter`
