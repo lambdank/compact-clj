@@ -6,5 +6,5 @@
 
 (use-fixtures :once tu/mock-reg-finding)
 
-(deftest when-let->when-first
+(deftest when-let->when-first-test
   (tu/test-example! #'hooks.when-let/when-let->when-first {:col 2 :end-col 10}))

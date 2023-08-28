@@ -4,8 +4,8 @@
    [hooks.utils :as u]))
 
 (defn- legal? [{:keys [children]}]
-  (let [[_$let $bindings & $body] children]
-    (and (seq $body) (u/vector? $bindings) (even? (count (:children $bindings))))))
+  (let [[_$when-let $bindings & $body] children]
+    (and (seq $body) (u/vector? $bindings) (u/count? $bindings 2))))
 
 (defn when-let->when-first
   {:type :compact-clj/when-let->when-first
