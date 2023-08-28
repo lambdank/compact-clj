@@ -3,36 +3,26 @@
    [clj-kondo.hooks-api :as api]
    [clojure.test :refer [deftest use-fixtures is]]
    [hooks.plus]
-   [hooks.test-utils :refer [mock-reg-finding]]))
+   [hooks.test-utils :as tu]
+   [hooks.utils :as u]))
 
-(use-fixtures :once mock-reg-finding)
+(use-fixtures :once tu/mock-reg-finding)
 
 (deftest +-remove-nested-test
-  (let [code "(+ (+ x y) z)"]
-    (is (= (list {:row 1
-                  :end-row 1
-                  :col 5
-                  :end-col 6
-                  :message "(+ x y) -shorten-> x y"
-                  :type :lol})
-           (hooks.plus/+-remove-nested (api/parse-string code))))))
+  (is (= (list {:row 1
+                :end-row 1
+                :col 5
+                :end-col 6
+                :message (u/->msg "(+ x y)" "x y")
+                :type :lol})
+         (hooks.plus/+-remove-nested (api/parse-string (-> #'hooks.plus/+-remove-nested meta :example :in str))))))
 
 (deftest +->inc-test
-  (let [code "(+ n 1)"]
-    (is (= {:row 1
-            :end-row 1
-            :col 2
-            :end-col 3
-            :message "(+ n 1) -shorten-> (inc n)"
-            :type :lol}
-           (hooks.plus/+->inc (api/parse-string code))))))
+  (tu/test-example! #'hooks.plus/+->inc {:col 2 :end-col 3})
+  (tu/test-example! #'hooks.plus/+->inc {:col 2 :end-col 3
+                                         :in '(+ 1 n)}))
 
 (deftest +->dec-test
-  (let [code "(+ n -1)"]
-    (is (= {:row 1
-            :end-row 1
-            :col 2
-            :end-col 3
-            :message "(+ n -1) -shorten-> (dec n)"
-            :type :lol}
-           (hooks.plus/+->dec (api/parse-string code))))))
+  (tu/test-example! #'hooks.plus/+->dec {:col 2 :end-col 3})
+  (tu/test-example! #'hooks.plus/+->dec {:col 2 :end-col 3
+                                         :in '(+ -1 n)}))

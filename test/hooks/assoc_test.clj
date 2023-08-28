@@ -3,28 +3,24 @@
    [clj-kondo.hooks-api :as api]
    [clojure.test :refer [deftest use-fixtures is]]
    [hooks.assoc]
-   [hooks.test-utils :refer [mock-reg-finding]]))
+   [hooks.test-utils :as tu]
+   [hooks.utils :as u]))
 
-(use-fixtures :once mock-reg-finding)
+(use-fixtures :once tu/mock-reg-finding)
 
 (deftest assoc-remove-nested-test
-  (let [code "(assoc (assoc {} :a 1) :b 2)"]
-    (is (= {:row 1
-            :col 2
-            :end-row 1
-            :end-col 7
-            :message "(assoc (assoc {} :a 1) :b 2) -shorten-> (assoc {} :a 1 :b 2)"
-            :type :lol}
-           (hooks.assoc/assoc-remove-nested (api/parse-string code))))))
+  (is (= {:row 1
+          :end-row 1
+          :col 9
+          :end-col 14
+          :message (u/->msg "(assoc m :a x)" "m :a x")
+          :type :lol}
+         (hooks.assoc/assoc-remove-nested
+          (api/parse-string (-> #'hooks.assoc/assoc-remove-nested meta :example :in str))))))
 
 (deftest assoc->assoc-in-test
-  (let [code "(assoc {:a 1} :b (assoc (:b {:a 1}) :c 2))"]
-    (is (= {:row 1
-            :col 2
-            :end-row 1
-            :end-col 7
-            :message
-            (str "(assoc {:a 1} :b (assoc (:b {:a 1}) :c 2)) "
-                 "-shorten-> (assoc-in {:a 1} [:b :c] 2)")
-            :type :lol}
-           (hooks.assoc/assoc->assoc-in (api/parse-string code))))))
+  (tu/test-example! #'hooks.assoc/assoc->assoc-in {:col 2 :end-col 7})
+  (tu/test-example! #'hooks.assoc/assoc->assoc-in {:col 2 :end-col 7
+                                                   :in '(assoc m :a (assoc (m :a) :b x))})
+  (tu/test-example! #'hooks.assoc/assoc->assoc-in {:col 2 :end-col 7
+                                                   :in '(assoc m :a (assoc (get m :a) :b x))}))

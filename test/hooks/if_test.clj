@@ -3,82 +3,31 @@
    [clj-kondo.hooks-api :as api]
    [clojure.test :refer [deftest use-fixtures is]]
    [hooks.if]
-   [hooks.test-utils :refer [mock-reg-finding]]))
+   [hooks.test-utils :as tu]
+   [hooks.utils :as u]))
 
-(use-fixtures :once mock-reg-finding)
+(use-fixtures :once tu/mock-reg-finding)
 
 (deftest if->if-not-test
-  (let [code "(if (not (= b a)) c d)"]
-    (is (= {:row 1
-            :end-row 1
-            :col 2
-            :end-col 4
-            :message "(if (not (= b a)) c d) -shorten-> (if-not (= b a) c d)"
-            :type :lol}
-           (hooks.if/if->if-not (api/parse-string code))))))
+  (tu/test-example! #'hooks.if/if->if-not {:col 2 :end-col 4}))
 
 (deftest if->when-test
-  (let [code "(if (p x) y nil)"]
-    (is (= {:row 1
-            :end-row 1
-            :col 2
-            :end-col 4
-            :message "(if (p x) y nil) -shorten-> (when (p x) y)"
-            :type :lol}
-           (hooks.if/if->when (api/parse-string code))))))
+  (tu/test-example! #'hooks.if/if->when {:col 2 :end-col 4}))
 
-(deftest if->boolean
-  (let [code "(if (p x) true false)"]
-    (is (= {:row 1
-            :end-row 1
-            :col 2
-            :end-col 4
-            :message "(if (p x) true false) -shorten-> (boolean (p x))"
-            :type :lol}
-           (hooks.if/if->boolean (api/parse-string code))))))
+(deftest if->boolean-test
+  (tu/test-example! #'hooks.if/if->boolean {:col 2 :end-col 4}))
 
-(deftest if->not
-  (let [code "(if (p x) false true)"]
-    (is (= {:row 1
-            :end-row 1
-            :col 2
-            :end-col 4
-            :message "(if (p x) false true) -shorten-> (not (p x))"
-            :type :lol}
-           (hooks.if/if->not (api/parse-string code))))))
+(deftest if->not-test
+  (tu/test-example! #'hooks.if/if->not {:col 2 :end-col 4}))
 
 (deftest if->cond->test
-  (let [code "(if (= a b) (+ a 2 3) a)"]
-    (is (= {:row 1
-            :end-row 1
-            :col 2
-            :end-col 4
-            :message "(if (= a b) (+ a 2 3) a) -shorten-> (cond-> a (= a b) (+ 2 3))"
-            :type :lol}
-           (hooks.if/if->cond-> (api/parse-string code)))))
-  (let [code "(if (= 2 2) (f) nil)"]
-    (is (nil? (hooks.if/if->cond-> (api/parse-string code))))))
+  (tu/test-example! #'hooks.if/if->not {:col 2 :end-col 4})
+  (is (nil? (hooks.if/if->cond-> (api/parse-string "(if (= 2 2) (f) nil)")))))
 
 (deftest if-move-to-inner
-  (let [code "(if (= a b) (f x a y) (f x b y))"]
-    (is (= {:row 1
-            :end-row 1
-            :col 2
-            :end-col 4
-            :message "(if (= a b) (f x a y) (f x b y)) -shorten-> (f x (if (= a b) a b) y)"
-            :type :lol}
-           (hooks.if/if-move-to-inner (api/parse-string code)))))
-  (let [code "(if (= a b) (fn x a y) (fn x b y))"]
-    (is (nil? (hooks.if/if-move-to-inner (api/parse-string code)))))
-  (let [code "(if (= a b) #(x a y) #(x b y))"]
-    (is (nil? (hooks.if/if-move-to-inner (api/parse-string code))))))
+  (tu/test-example! #'hooks.if/if-move-to-inner {:col 2 :end-col 4})
+  (is (nil? (hooks.if/if-move-to-inner (api/parse-string "(if (= a b) (fn x a y) (fn x b y))"))))
+  (is (nil? (hooks.if/if-move-to-inner (api/parse-string "(if (= a b) (fn x a y) (fn x b y))")))))
 
 (deftest if->or
-  (let [code "(if x x y)"]
-    (is (= {:row 1
-            :end-row 1
-            :col 2
-            :end-col 4
-            :message "(if x x y) -shorten-> (or x y)"
-            :type :lol}
-           (hooks.if/if->or (api/parse-string code))))))
+  (tu/test-example! #'hooks.if/if->or {:col 2 :end-col 4}))

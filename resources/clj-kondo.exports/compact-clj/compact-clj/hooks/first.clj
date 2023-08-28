@@ -6,7 +6,8 @@
   (u/count? node 2))
 
 (defn first->ffirst
-  "Compression: (first (first coll)) -> (ffirst coll)"
+  {:example {:in '(first (first coll))
+             :out '(ffirst coll)}}
   [{:keys [children] :as node}]
   (let [[$first {[$nested-first $nested-coll] :children :as $coll}] children]
     (when (and (u/count? node 2)
@@ -16,7 +17,8 @@
       (u/reg-compression! node $first (str "(ffirst " $nested-coll ")")))))
 
 (defn first->second
-  "Compression: (first (next coll)) -> (second coll)"
+  {:example {:in '(first (next coll))
+             :out '(second coll)}}
   [{:keys [children] :as node}]
   (let [[$first {[$next $nested-coll] :children :as $coll}] children]
     (when (and (u/count? node 2)

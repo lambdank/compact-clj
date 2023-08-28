@@ -6,7 +6,8 @@
   (pos? (count (:children node))))
 
 (defn =->true?
-  "Compression: (= x true) -> (true? x)"
+  {:example {:in '(= x true)
+             :out '(true? x)}}
   [{:keys [children] :as node}]
   (let [[$= $x $y] children]
     (when (u/count? node 3)
@@ -14,7 +15,8 @@
             (u/symbol? $y "true") (u/reg-compression! node $= (str "(true? " $x ")"))))))
 
 (defn =->nil?
-  "Compression: (= x nil) -> (nil? x)"
+  {:example {:in '(= x nil)
+             :out '(nil? x)}}
   [{:keys [children] :as node}]
   (let [[$= $x $y] children]
     (when (u/count? node 3)
@@ -22,7 +24,8 @@
             (u/symbol? $y "nil") (u/reg-compression! node $= (str "(nil? " $x ")"))))))
 
 (defn =->empty?
-  "Compression: (= 0 (count coll)) -> (empty? coll)"
+  {:example {:in '(= 0 (count coll))
+             :out '(empty? coll)}}
   [{:keys [children] :as node}]
   (let [[$= $x $y] children
         [$x-count $x-coll] (:children $x)

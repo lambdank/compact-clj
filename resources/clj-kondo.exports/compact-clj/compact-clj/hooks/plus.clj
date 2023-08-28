@@ -7,7 +7,8 @@
   (< 2 (count children)))
 
 (defn +-remove-nested
-  "Compression: (+ (+ x y) z) -> (+ x y z)"
+  {:example {:in '(+ (+ x y) z)
+             :out '(+ x y z)}}
   [{[_$+ & $args] :children}]
   (->> $args
        (keep (fn [{[$nested-+ & $nested-args] :children :as nested-+-node}]
@@ -15,10 +16,11 @@
                           (u/symbol? $nested-+ "+")
                           (<= 2 (count (:children nested-+-node))))
                  (u/reg-compression! nested-+-node $nested-+ (str/join " " $nested-args)))))
-       doall))
+       seq))
 
 (defn +->inc
-  "Compression: (+ n 1) -> (inc n)"
+  {:example {:in '(+ n 1)
+             :out '(inc n)}}
   [{:keys [children] :as node}]
   (let [[$+ $x $y] children]
     (when (u/count? node 3)
@@ -27,7 +29,8 @@
         (u/symbol? $y "1") (u/reg-compression! node $+ (str "(inc " $x ")"))))))
 
 (defn +->dec
-  "Compression: (+ n -1) -> (dec n)"
+  {:example {:in '(+ n -1)
+             :out '(dec n)}}
   [{:keys [children] :as node}]
   (let [[$+ $x $y] children]
     (when (u/count? node 3)

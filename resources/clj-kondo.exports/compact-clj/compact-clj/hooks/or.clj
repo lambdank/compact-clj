@@ -8,7 +8,8 @@
   (<= 2 (count children)))
 
 (defn or->some
-  "Compression: (or (f x) (f y)) -> (some f [x y])"
+  {:example {:in '(or (f x) (f y))
+             :out '(some f [x y])}}
   [{:keys [children] :as node}]
   (let [[$or & $args] children
         {[$pred] :children} (first $args)]
@@ -20,7 +21,8 @@
        (str "(some " $pred " [" (str/join " " (map (comp second :children) $args)) "])")))))
 
 (defn or->get
-  "Compression: ((or (get m k) x) -> (get m k x)"
+  {:example {:in '(or (get m k) x)
+             :out '(get m k x)}}
   [{:keys [children] :as node}]
   (let [[$or $x $y] children]
     (when (and (u/count? node 3)

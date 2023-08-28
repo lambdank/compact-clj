@@ -6,7 +6,8 @@
   (u/count? node 3))
 
 (defn filter->remove
-  "Compression: (filter #(not (f %)) coll) -> (remove f coll)"
+  {:example {:in '(filter (fn [x] (not (f x))) coll)
+             :out '(remove (fn [x] (f x)) coll)}}
   [{:keys [children] :as node}]
   (let [[$filter $pred $coll] children
         {[$pred-1 $pred-2 $pred-3] :children} $pred]
@@ -41,7 +42,8 @@
        (str "(remove (fn " $pred-2 " " (second (:children $pred-3)) ") " $coll ")")))))
 
 (defn filter->keep
-  "Compression: (filter some? (map f coll)) -> (keep f coll)"
+  {:example {:in '(filter some? (map f coll))
+             :out '(keep f coll)}}
   [{:keys [children] :as node}]
   (let [[$filter $pred $coll] children
         {[$map $f & $colls] :children} $coll]

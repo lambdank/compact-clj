@@ -8,7 +8,8 @@
   (u/count? node 4))
 
 (defn if->if-not
-  "Compression: (if (not x) y z) -> (if-not x y z)"
+  {:example {:in '(if (not x) y z)
+             :out '(if-not x y z)}}
   [{:keys [children] :as node}]
   (let [[$if $test $then $else] children
         [$test-1 $test-2] (:children $test)]
@@ -18,21 +19,24 @@
       (u/reg-compression! node $if (str "(if-not " $test-2 " " $then " " $else ")")))))
 
 (defn if->when
-  "Compression: (if x y nil) -> (when x y)"
+  {:example {:in '(if x y nil)
+             :out '(when x y)}}
   [{:keys [children] :as node}]
   (let [[$if $test $then $else] children]
     (when (u/symbol? $else "nil")
       (u/reg-compression! node $if (str "(when " $test " " $then ")")))))
 
 (defn if->boolean
-  "Compression: (if x true false) -> (boolean x)"
+  {:example {:in '(if x true false)
+             :out '(boolean x)}}
   [{:keys [children] :as node}]
   (let [[$if $test $then $else] children]
     (when (and (u/symbol? $then "true") (u/symbol? $else "false"))
       (u/reg-compression! node $if (str "(boolean " $test ")")))))
 
 (defn if->not
-  "Compression: (if t false true) -> (not t)"
+  {:example {:in '(if t false true)
+             :out '(not t)}}
   [{:keys [children] :as node}]
   (let [[$if $test $then $else] children]
     (when (and (u/symbol? $then "false")
@@ -40,7 +44,8 @@
       (u/reg-compression! node $if (str "(not " $test ")")))))
 
 (defn if->cond->
-  "Compression: (if t (f x) x) -> (cond-> x t (f))"
+  {:example {:in '(if t (f x) x)
+             :out '(cond-> x t (f))}}
   [{:keys [children] :as node}]
   (let [[$if $test $then $else] children
         [$then-1 $then-2 & $then-args] (:children $then)]
@@ -53,7 +58,8 @@
        (str "(cond-> " $else " " $test " ("  (str/join " " (conj $then-args $then-1)) ")" ")")))))
 
 (defn if-move-to-inner
-  "Compression: (if t (f x y) (f z y)) -> (f (if t x z) y)"
+  {:example {:in '(if t (f x y) (f z y))
+             :out '(f (if t x z) y)}}
   [{:keys [children] :as node}]
   (let [[$if $test $then $else] children
         $then-args (:children $then)
@@ -79,7 +85,8 @@
                   (str/join " " (drop (inc i) $then-args)) ")"))))))))
 
 (defn if->or
-  "Compression: (if x x y) -> (or x y)"
+  {:example {:in '(if x x y)
+             :out '(or x y)}}
   [{:keys [children] :as node}]
   (let [[$if $test $then $else] children]
     (when (u/code= $test $then)

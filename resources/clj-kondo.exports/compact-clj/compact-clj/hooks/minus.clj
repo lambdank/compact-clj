@@ -6,7 +6,8 @@
   (< 2 (count children)))
 
 (defn -->inc
-  "Compression: (- n -1) -> (inc n)"
+  {:example {:in '(- n -1)
+             :out '(inc n)}}
   [{:keys [children] :as node}]
   (let [[$- $x $y] children]
     (when (and (u/count? node 3)
@@ -14,7 +15,8 @@
       (u/reg-compression! node $- (str "(inc " $x ")")))))
 
 (defn -->dec
-  "Compression: (- n 1) -> (dec n)"
+  {:example {:in '(- n 1)
+             :out '(dec n)}}
   [{:keys [children] :as node}]
   (let [[$+ $x $y] children]
     (when (and (u/count? node 3)

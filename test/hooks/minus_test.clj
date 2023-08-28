@@ -1,28 +1,13 @@
 (ns hooks.minus-test
   (:require
-   [clj-kondo.hooks-api :as api]
-   [clojure.test :refer [deftest use-fixtures is]]
+   [clojure.test :refer [deftest use-fixtures]]
    [hooks.minus]
-   [hooks.test-utils :refer [mock-reg-finding]]))
+   [hooks.test-utils :as tu]))
 
-(use-fixtures :once mock-reg-finding)
+(use-fixtures :once tu/mock-reg-finding)
 
 (deftest -->inc-test
-  (let [code "(- n -1)"]
-    (is (= {:row 1
-            :end-row 1
-            :col 2
-            :end-col 3
-            :message "(- n -1) -shorten-> (inc n)"
-            :type :lol}
-           (hooks.minus/-->inc (api/parse-string code))))))
+  (tu/test-example! #'hooks.minus/-->inc {:col 2 :end-col 3}))
 
 (deftest -->dec
-  (let [code "(- n 1)"]
-    (is (= {:row 1
-            :end-row 1
-            :col 2
-            :end-col 3
-            :message "(- n 1) -shorten-> (dec n)"
-            :type :lol}
-           (hooks.minus/-->dec (api/parse-string code))))))
+  (tu/test-example! #'hooks.minus/-->dec {:col 2 :end-col 3}))

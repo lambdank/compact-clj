@@ -7,7 +7,8 @@
   (< 2 (count children)))
 
 (defn when->when-not
-  "Compression: (when (not x) body) -> (when-not x body)"
+  {:example {:in '(when (not x) body)
+             :out '(when-not x body)}}
   [{:keys [children] :as node}]
   (let [[$when $test & $body] children
         [$not $x] (:children $test)]
@@ -17,7 +18,8 @@
       (u/reg-compression! node $when (str "(when-not " $x " " (str/join " " $body) ")")))))
 
 (defn when->not-empty
-  "Compression: (when (seq coll) coll) -> (not-empty coll)"
+  {:example {:in '(when (seq coll) coll)
+             :out '(not-empty coll)}}
   [{:keys [children] :as node}]
   (let [[$when $test & $body] children
         [$seq $coll] (:children $test)]

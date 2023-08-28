@@ -3,16 +3,17 @@
    [clj-kondo.hooks-api :as api]
    [clojure.test :refer [deftest use-fixtures is]]
    [hooks.conj]
-   [hooks.test-utils :refer [mock-reg-finding]]))
+   [hooks.test-utils :as tu]
+   [hooks.utils :as u]))
 
-(use-fixtures :once mock-reg-finding)
+(use-fixtures :once tu/mock-reg-finding)
 
-(deftest when-let->when-first
-  (let [code "(conj (conj [] x) y)"]
-    (is (= {:row 1
-            :col 2
-            :end-row 1
-            :end-col 6
-            :message "(conj (conj [] x) y) -shorten-> (conj [] x y)"
-            :type :lol}
-           (hooks.conj/conj-remove-nested (api/parse-string code))))))
+(deftest conj-remove-nested-test
+  (is (= {:row 1
+          :end-row 1
+          :col 8
+          :end-col 12
+          :message (u/->msg "(conj coll x)" "coll x")
+          :type :lol}
+         (hooks.conj/conj-remove-nested
+          (api/parse-string (-> #'hooks.conj/conj-remove-nested meta :example :in str))))))

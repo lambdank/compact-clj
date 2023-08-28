@@ -6,7 +6,8 @@
   (u/count? node 3))
 
 (defn map-remove-nested
-  "Compression: (map f (map g coll)) -shorten-> (map (comp f g) coll)"
+  {:example {:in '(map f (map g coll))
+             :out '(map (comp f g) coll)}}
   [{:keys [children] :as node}]
   (let [[$map $f $coll] children
         [$nested-map $nested-f $nested-coll] (:children $coll)]

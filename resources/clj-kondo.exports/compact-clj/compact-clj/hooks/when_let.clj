@@ -8,7 +8,8 @@
     (and (seq $body) (u/vector? $bindings) (even? (count (:children $bindings))))))
 
 (defn when-let->when-first
-  "Compression: (when-let [x (first xs)] (f x)) -> (when-first [x xs] (f x))"
+  {:example {:in '(when-let [x (first xs)] (f x))
+             :out '(when-first [x xs] (f x))}}
   [{:keys [children] :as node}]
   (let [[$when-let $bindings & $body] children
         {[$key $value] :children} $bindings
@@ -23,6 +24,6 @@
        $when-let
        (str "(when-first [" $key " " $coll "] " (str/join " " $body)")")))))
 
-(defn all [{:keys [node] :as kappa}]
+(defn all [{:keys [node]}]
   (when (and (u/in-source? node) (legal? node))
     (when-let->when-first node)))

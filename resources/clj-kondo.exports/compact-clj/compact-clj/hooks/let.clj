@@ -1,6 +1,5 @@
 (ns ^:no-doc hooks.let
   (:require
-   [clj-kondo.hooks-api :as api]
    [clojure.string :as str]
    [hooks.utils :as u]))
 
@@ -9,7 +8,8 @@
     (and (seq $exprs) (u/vector? $bindings))))
 
 (defn let->doto
-  "Compression: (let [x y] (f x) (g x) x) -> (doto y (f) (g))"
+  {:example {:in '(let [x y] (f x) (g x) x)
+             :out '(doto y (f) (g))}}
   [{:keys [children] :as node}]
   (let [[$let $bindings & $exprs] children
         [$key $value] (:children $bindings)
@@ -23,7 +23,8 @@
         (u/reg-compression! node $let (str "(doto " $value " " (str/join " " modified-exprs) ")"))))))
 
 (defn let->when-let
-  "Compression: (let [x y] (when x (f x)) -> (when-let [x y] (f x))"
+  {:example {:in '(let [x y] (when x (f x)))
+             :out '(when-let [x y] (f x))}}
   [{:keys [children] :as node}]
   (let [[$let $bindings $exprs] children
         [$key] (:children $bindings)
@@ -36,7 +37,8 @@
       (u/reg-compression! node $let (str "(when-let " $bindings " " (str/join " " $body) ")")))))
 
 (defn let->if-let
-  "Compression: (let [x y] (if x (f x) z) -> (if-let [x y] (f x) z)"
+  {:example {:in '(let [x y] (if x (f x) z))
+             :out '(if-let [x y] (f x) z)}}
   [{:keys [children] :as node}]
   (let [[$let $bindings $exprs] children
         [$key] (:children $bindings)

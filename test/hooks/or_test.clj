@@ -1,36 +1,15 @@
 (ns hooks.or-test
   (:require
-   [clj-kondo.hooks-api :as api]
-   [clojure.test :refer [deftest use-fixtures is]]
+   [clojure.test :refer [deftest use-fixtures]]
    [hooks.or]
-   [hooks.test-utils :refer [mock-reg-finding]]))
+   [hooks.test-utils :as tu]))
 
-(use-fixtures :once mock-reg-finding)
+(use-fixtures :once tu/mock-reg-finding)
 
 (deftest or->some-test
-  (let [code "(or (even? 5) (even? 7) (even? 8))"]
-    (is (= {:row 1
-            :end-row 1
-            :col 2
-            :end-col 4
-            :message "(or (even? 5) (even? 7) (even? 8)) -shorten-> (some even? [5 7 8])"
-            :type :lol}
-           (hooks.or/or->some (api/parse-string code))))))
+  (tu/test-example! #'hooks.or/or->some {:col 2 :end-col 4}))
 
 (deftest or->get-test
-  (let [code "(or (:a x) y)"]
-    (is (= {:row 1
-            :end-row 1
-            :col 2
-            :end-col 4
-            :message "(or (:a x) y) -shorten-> (:a x y)"
-            :type :lol}
-           (hooks.or/or->get (api/parse-string code)))))
-  (let [code "(or (get m k) x)"]
-    (is (= {:row 1
-            :end-row 1
-            :col 2
-            :end-col 4
-            :message "(or (get m k) x) -shorten-> (get m k x)"
-            :type :lol}
-           (hooks.or/or->get (api/parse-string code))))))
+  (tu/test-example! #'hooks.or/or->get {:col 2 :end-col 4})
+  (tu/test-example! #'hooks.or/or->get {:col 2 :end-col 4
+                                        :in '(or (get m k) x)}))

@@ -7,14 +7,16 @@
   (u/count? node 3))
 
 (defn into->vec
-  "Compression: (into [] [1 2 3])"
+  {:example {:in '(into [] '(x y z))
+             :out '(vec '(x y z))}}
   [{:keys [children] :as node}]
   (let [[$into $to $from] children]
     (when (and (every-pred u/empty? u/vector?) $to)
       (u/reg-compression! node $into (str "(vec " $from ")")))))
 
 (defn into->set
-  "Compression: (into #{} [1 2 3])"
+  {:example {:in '(into #{} [x y z])
+             :out '(set [x y z])}}
   [{:keys [children] :as node}]
   (let [[$into $to $from] children]
     (when (and (every-pred u/empty? u/set?) $to)

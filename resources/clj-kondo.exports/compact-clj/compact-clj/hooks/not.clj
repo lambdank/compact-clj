@@ -7,7 +7,8 @@
   (u/count? node 2))
 
 (defn not->not=
-  "Compression: (not (= x y)) -> (not= x y)"
+  {:example {:in '(not (= x y))
+             :out '(not= x y)}}
   [{:keys [children] :as node}]
   (let [[$not $x] children
         [$= & $=-args] (:children $x)]
@@ -17,7 +18,8 @@
       (u/reg-compression! node $not (str "(not= " (str/join " " $=-args) ")")))))
 
 (defn not->not-any?
-  "Compression: (not (some f coll)) -> (not-any? f coll) "
+  {:example {:in '(not (some f coll))
+             :out '(not-any? f coll)}}
   [{:keys [children] :as node}]
   (let [[$not $x] children
         [$some $pred $coll] (:children $x)]
@@ -27,7 +29,8 @@
       (u/reg-compression! node $not (str "(not-any? " $pred " " $coll ")")))))
 
 (defn not->boolean
-  "Compression: (not (not x)) -> (boolean x)"
+  {:example {:in '(not (not x))
+             :out '(boolean x)}}
   [{:keys [children] :as node}]
   (let [[$not $x] children
         [$x-not $x-x] (:children $x)]
@@ -37,7 +40,8 @@
       (u/reg-compression! node $not (str "(boolean " $x-x ")")))))
 
 (defn not->not-every?
-  "Compression: (not (every? pred coll)) -> (not-every? pred coll)"
+  {:example {:in '(not (every? pred coll))
+             :out '(not-every? pred coll)}}
   [{:keys [children] :as node}]
   (let [[$not $x] children
         [$every? $pred $coll] (:children $x)]
@@ -47,7 +51,8 @@
       (u/reg-compression! node $not (str "(not-every? " $pred " " $coll ")")))))
 
 (defn not->seq
-  "Compression: (not (empty? coll)) -> (seq coll)"
+  {:example {:in '(not (empty? coll))
+             :out '(seq coll)}}
   [{:keys [children] :as node}]
   (let [[$not $x] children
         [$empty? $coll] (:children $x)]
@@ -57,7 +62,8 @@
       (u/reg-compression! node $not (str "(seq " $coll ")")))))
 
 (defn not->even?
-  "Compression: (not (odd? n)) -> (even? n)"
+  {:example {:in '(not (odd? n))
+             :out '(even? n)}}
   [{:keys [children] :as node}]
   (let [[$not $x] children
         [$odd? $n] (:children $x)]
@@ -67,7 +73,8 @@
       (u/reg-compression! node $not (str "(even? " $n ")")))))
 
 (defn not->odd?
-  "Compression: (not (even? n)) -> (odd? n)"
+  {:example {:in '(not (even? n))
+             :out '(odd? n)}}
   [{:keys [children] :as node}]
   (let [[$not $x] children
         [$even? $n] (:children $x)]
@@ -77,7 +84,8 @@
       (u/reg-compression! node $not (str "(odd? " $n ")")))))
 
 (defn not->true?
-  "Compression: (not (true? x)) -> (false? x)"
+  {:example {:in '(not (false? x))
+             :out '(true? x)}}
   [{:keys [children] :as node}]
   (let [[$not $x] children
         [$false? $x-x] (:children $x)]
@@ -87,7 +95,8 @@
       (u/reg-compression! node $not (str "(true? " $x-x ")")))))
 
 (defn not->false?
-  "Compression: (not (false? x)) -> (true? x)"
+  {:example {:in '(not (true? x))
+             :out '(false? x)}}
   [{:keys [children] :as node}]
   (let [[$not $x] children
         [$true? $x-x] (:children $x)]
@@ -97,7 +106,8 @@
       (u/reg-compression! node $not (str "(false? " $x-x ")")))))
 
 (defn not->some?
-  "Compression: (not (nil? x)) -> (some? x)"
+  {:example {:in '(not (nil? x))
+             :out '(some? x)}}
   [{:keys [children] :as node}]
   (let [[$not $x] children
         [$nil? $x-x] (:children $x)]
@@ -107,7 +117,8 @@
       (u/reg-compression! node $not (str "(some? " $x-x ")")))))
 
 (defn not->empty?
-  "Compression: (not (seq coll)) -> (empty? coll)"
+  {:example {:in '(not (seq coll))
+             :out '(empty? coll)}}
   [{:keys [children] :as node}]
   (let [[$not $x] children
         [$seq $coll] (:children $x)]

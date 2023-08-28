@@ -8,7 +8,8 @@
   (<= 2 (count children)))
 
 (defn and-remove-nested
-  "Compression: (and (and x y) z) -> (and x y z)"
+  {:example {:in '(and (and x y) z)
+             :out '(and x y z)}}
   [{[_$and & $args] :children}]
   (->> $args
        (keep (fn [{[$nested-and & $nested-args] :children :as nested-and-node}]
@@ -19,7 +20,8 @@
        doall))
 
 (defn and->every?
-  "Compression: (and (f x) (f y)) -> (every? f [x y])"
+  {:example {:in '(and (f x) (f y))
+             :out '(every? f [x y])}}
   [{[$and {[$pred $x] :children} & $args] :children :as node}]
   (when (and (every? #(u/count? % 2) $args)
              (every? #{$pred} (map (comp first :children) $args)))

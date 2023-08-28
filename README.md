@@ -119,7 +119,7 @@ You might need to ignore this in your git projects, if you are the only one usin
 ;; let -> when-let
 (let [x y] (when x (f x))) -> (when-let [x y] (f x))
 ;; let -> if-let
-(let [x y] (if x (f x) (g))) -> (if-let [x y] (f x) (g)))
+(let [x y] (if x (f x) z)) -> (if-let [x y] (f x) z))
 ```
 
 ## `map`
