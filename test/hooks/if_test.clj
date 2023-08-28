@@ -67,7 +67,11 @@
             :end-col 4
             :message "(if (= a b) (f x a y) (f x b y)) -shorten-> (f x (if (= a b) a b) y)"
             :type :lol}
-           (hooks.if/if-move-to-inner (api/parse-string code))))))
+           (hooks.if/if-move-to-inner (api/parse-string code)))))
+  (let [code "(if (= a b) (fn x a y) (fn x b y))"]
+    (is (nil? (hooks.if/if-move-to-inner (api/parse-string code)))))
+  (let [code "(if (= a b) #(x a y) #(x b y))"]
+    (is (nil? (hooks.if/if-move-to-inner (api/parse-string code))))))
 
 (deftest if->or
   (let [code "(if x x y)"]

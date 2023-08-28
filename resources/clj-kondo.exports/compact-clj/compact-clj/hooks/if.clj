@@ -61,16 +61,21 @@
     (when (and (u/list? $then)
                (u/list? $else)
                (seq $then-args)
-               (= (count $then-args) (count $else-args)))
+               (= (count $then-args) (count $else-args))
+               ;; Avoid moving if inside a function, since it will be evaluated for each invocation
+               (->> [$then-args $else-args]
+                    (map first)
+                    (not-any? (some-fn #(u/symbol? % "fn") u/fn?))))
       (let [pairs (partition 2 (interleave $then-args $else-args))
-            diff (keep-indexed #(when-not (= (first %2) (second %2)) [%1 %2]) pairs)]
+            diff (keep-indexed #(when-not (u/code= (first %2) (second %2)) [%1 %2]) pairs)]
         (when (= (count diff) 1)
           (let [[[i [t e]]] diff]
             (u/reg-compression!
              node
              $if
              (str "(" (str/join " " (take i $then-args))
-                  " (if " $test " " t " " e ") "
+                  (when (pos? i) " ")
+                  "(if " $test " " t " " e ") "
                   (str/join " " (drop (inc i) $then-args)) ")"))))))))
 
 (defn if->or
