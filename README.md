@@ -29,6 +29,14 @@ You might need to ignore this in your git projects, if you are the only one usin
 (= 0 (count coll)) -> (empty? coll)
 ```
 
+## `-`
+```clojure
+;; - -> inc
+(- n -1) -> (inc n)
+;; - -> dec
+(- n 1) -> (dec n)
+```
+
 ## `+`
 ```clojure
 ;; remove nested ands
