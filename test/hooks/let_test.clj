@@ -14,3 +14,6 @@
 
 (deftest let->if-let-test
   (tu/test-example! #'hooks.let/let->if-let {:col 2 :end-col 5}))
+
+(deftest let->when-some-test
+  (tu/test-example! #'hooks.let/let->when-some {:col 2 :end-col 5}))

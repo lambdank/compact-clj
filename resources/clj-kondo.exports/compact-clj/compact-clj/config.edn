@@ -57,6 +57,7 @@
            :compact-clj/let->doto {:level :warning}
            :compact-clj/let->if-let {:level :warning}
            :compact-clj/let->when-let {:level :warning}
+           :compact-clj/let->when-some {:level :warning}
 
            :compact-clj/map-remove-nested {:level :off}
 

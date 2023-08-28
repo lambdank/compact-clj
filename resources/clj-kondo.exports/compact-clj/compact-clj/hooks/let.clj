@@ -46,6 +46,28 @@
        $let
        (str "(when-let " $bindings " " (str/join " " $body) ")")))))
 
+(defn let->when-some
+  {:type :compact-clj/let->when-some
+   :example {:in '(let [x y] (when (some? x) (f x)))
+             :out '(when-some [x y] (f x))}}
+  [{:keys [children] :as node}]
+  (let [[$let $bindings $exprs] children
+        [$key] (:children $bindings)
+        [$when $test & $body] (:children $exprs)
+        [$some? $x] (:children $test)]
+    (when (and (u/count? node 3)
+               (u/count? $bindings 2)
+               (u/list? $exprs)
+               (u/symbol? $when "when")
+               (u/list? $test)
+               (u/symbol? $some? "some?")
+               (= $key $x))
+      (u/reg-compression!
+       :compact-clj/let->when-some
+       node
+       $let
+       (str "(when-some " $bindings " " (str/join " " $body) ")")))))
+
 (defn let->if-let
   {:type :compact-clj/let->if-let
    :example {:in '(let [x y] (if x (f x) z))
@@ -69,4 +91,4 @@
 
 (defn all [{:keys [node]}]
   (when (and (u/in-source? node) (legal? node))
-    ((juxt let->doto let->when-let) node)))
+    ((juxt let->doto let->when-let let->if-let let->when-some) node)))
