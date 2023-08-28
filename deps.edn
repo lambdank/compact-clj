@@ -1,5 +1,10 @@
 {:paths ["resources"]
+ :deps {clj-kondo/clj-kondo {:mvn/version "2023.07.13"}}
  :aliases
  {:dev {:extra-paths ["src"] 
-        :extra-deps {clj-kondo/clj-kondo {:mvn/version "2023.07.13"}}}
+        :extra-deps {nrepl/nrepl {:mvn/version "1.0.0"}
+                     cider/cider-nrepl {:mvn/version "0.36.0"}}
+        :main-opts ["--main" "nrepl.cmdline"
+                    "--middleware" "[cider.nrepl/cider-middleware]"
+                    "--interactive"]}
   :test {:extra-paths ["test"]}}}
