@@ -65,4 +65,7 @@
 
 (when (not x) y)
 (when (seq coll) coll)
+
 (when-let [x (first xs)] (f x))
+
+(when-some [x y] (f x))
