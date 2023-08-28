@@ -16,3 +16,6 @@
   (tu/test-example! #'hooks.eq/=->empty? {:col 2 :end-col 3})
   (tu/test-example! #'hooks.eq/=->empty? {:col 2 :end-col 3
                                           :in '(= (count coll) 0)}))
+
+(deftest =-remove-duplicate-test
+  (tu/test-example! #'hooks.eq/=-remove-duplicate {:col 2 :end-col 3}))

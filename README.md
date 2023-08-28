@@ -27,6 +27,8 @@ You might need to ignore this in your git projects, if you are the only one usin
 (= x nil) -> (nil? x)
 ;; = -> empty?
 (= 0 (count coll)) -> (empty? coll)
+;; remove duplicates in =
+(= x x y) -> (= x y)
 ```
 
 ## `-`

@@ -1,5 +1,6 @@
 (ns ^:no-doc hooks.eq
   (:require
+   [clojure.string :as str]
    [hooks.utils :as u]))
 
 (defn- legal? [node]
@@ -41,6 +42,18 @@
                  (u/symbol? $x-count "count"))
             (u/reg-compression! node $= (str "(empty? " $x-coll ")"))))))
 
+(defn =-remove-duplicate
+  {:example {:in '(= x x)
+             :out '(= x y)}}
+  [{:keys [children] :as node}]
+  (let [[$= & $args] children]
+    (when (not-empty (->> $args
+                          (map u/->sexpr)
+                          frequencies
+                          (map second)
+                          (filter #(< 1 %))))
+      (u/reg-compression! node $= (str "(= " (str/join " " (distinct (map u/->sexpr $args))) ")")))))
+
 (defn all [{:keys [node]}]
   (when (and (u/in-source? node) (legal? node))
-    ((juxt =->true? =->nil? =->empty?) node)))
+    ((juxt =->true? =->nil? =->empty? =-remove-duplicate) node)))
