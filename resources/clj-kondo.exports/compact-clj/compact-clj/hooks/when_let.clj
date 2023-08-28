@@ -8,7 +8,8 @@
     (and (seq $body) (u/vector? $bindings) (even? (count (:children $bindings))))))
 
 (defn when-let->when-first
-  {:example {:in '(when-let [x (first xs)] (f x))
+  {:type :compact-clj/when-let->when-first
+   :example {:in '(when-let [x (first xs)] (f x))
              :out '(when-first [x xs] (f x))}}
   [{:keys [children] :as node}]
   (let [[$when-let $bindings & $body] children
@@ -20,6 +21,7 @@
                (u/count? $value 2)
                (u/symbol? $first "first"))
       (u/reg-compression!
+       :compact-clj/when-let->when-first
        node
        $when-let
        (str "(when-first [" $key " " $coll "] " (str/join " " $body)")")))))

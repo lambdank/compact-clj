@@ -14,7 +14,7 @@
                 :col 7
                 :end-col 10
                 :message (u/->msg "(and x y)" "x y")
-                :type :lol})
+                :type :compact-clj/and-remove-nested})
          (hooks.and/and-remove-nested (api/parse-string (-> #'hooks.and/and-remove-nested meta :example :in str))))))
 
 (deftest and->every?

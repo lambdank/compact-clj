@@ -8,7 +8,8 @@
     (and (seq $exprs) (u/vector? $bindings))))
 
 (defn let->doto
-  {:example {:in '(let [x y] (f x) (g x) x)
+  {:type :compact-clj/let->doto
+   :example {:in '(let [x y] (f x) (g x) x)
              :out '(doto y (f) (g))}}
   [{:keys [children] :as node}]
   (let [[$let $bindings & $exprs] children
@@ -20,10 +21,15 @@
       (let [modified-exprs (map #(update % :children (fn [[$f _$key & $args]]
                                                        (into (list $f) $args)))
                                 exprs-wihout-last)]
-        (u/reg-compression! node $let (str "(doto " $value " " (str/join " " modified-exprs) ")"))))))
+        (u/reg-compression!
+         :compact-clj/let->doto
+         node
+         $let
+         (str "(doto " $value " " (str/join " " modified-exprs) ")"))))))
 
 (defn let->when-let
-  {:example {:in '(let [x y] (when x (f x)))
+  {:type :compact-clj/let->when-let
+   :example {:in '(let [x y] (when x (f x)))
              :out '(when-let [x y] (f x))}}
   [{:keys [children] :as node}]
   (let [[$let $bindings $exprs] children
@@ -34,10 +40,15 @@
                (u/list? $exprs)
                (u/symbol? $when "when")
                (= $key $test))
-      (u/reg-compression! node $let (str "(when-let " $bindings " " (str/join " " $body) ")")))))
+      (u/reg-compression!
+       :compact-clj/let->when-let
+       node
+       $let
+       (str "(when-let " $bindings " " (str/join " " $body) ")")))))
 
 (defn let->if-let
-  {:example {:in '(let [x y] (if x (f x) z))
+  {:type :compact-clj/let->if-let
+   :example {:in '(let [x y] (if x (f x) z))
              :out '(if-let [x y] (f x) z)}}
   [{:keys [children] :as node}]
   (let [[$let $bindings $exprs] children
@@ -50,7 +61,11 @@
                (= $key $predicate)
                (u/symbol? $if "if")
                (not-any? #{$predicate} (:children $else)))
-      (u/reg-compression! node $let (str "(if-let " $bindings " " $then " " $else ")")))))
+      (u/reg-compression!
+       :compact-clj/let->if-let
+       node
+       $let
+       (str "(if-let " $bindings " " $then " " $else ")")))))
 
 (defn all [{:keys [node]}]
   (when (and (u/in-source? node) (legal? node))

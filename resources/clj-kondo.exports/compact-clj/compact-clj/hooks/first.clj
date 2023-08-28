@@ -6,7 +6,8 @@
   (u/count? node 2))
 
 (defn first->ffirst
-  {:example {:in '(first (first coll))
+  {:type :compact-clj/first->ffirst
+   :example {:in '(first (first coll))
              :out '(ffirst coll)}}
   [{:keys [children] :as node}]
   (let [[$first {[$nested-first $nested-coll] :children :as $coll}] children]
@@ -14,10 +15,15 @@
                (u/list? $coll)
                (u/symbol? $nested-first "first")
                (u/count? $coll 2))
-      (u/reg-compression! node $first (str "(ffirst " $nested-coll ")")))))
+      (u/reg-compression!
+       :compact-clj/first->ffirst
+       node
+       $first
+       (str "(ffirst " $nested-coll ")")))))
 
 (defn first->second
-  {:example {:in '(first (next coll))
+  {:type :compact-clj/first->second
+   :example {:in '(first (next coll))
              :out '(second coll)}}
   [{:keys [children] :as node}]
   (let [[$first {[$next $nested-coll] :children :as $coll}] children]
@@ -25,7 +31,11 @@
                (u/list? $coll)
                (u/symbol? $next "next")
                (u/count? $coll 2))
-      (u/reg-compression! node $first (str "(second " $nested-coll  ")")))))
+      (u/reg-compression!
+       :compact-clj/first->second
+       node
+       $first
+       (str "(second " $nested-coll  ")")))))
 
 (defn all [{:keys [node]}]
   (when (and (u/in-source? node) (legal? node))

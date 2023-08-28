@@ -7,17 +7,23 @@
   ((every-pred even? #(<= 4 %)) (count children)))
 
 (defn assoc-remove-nested
-  {:example {:in '(assoc (assoc m :a x) :b y)
+  {:type :compact-clj/assoc-remove-nested
+   :example {:in '(assoc (assoc m :a x) :b y)
              :out '(assoc m :a x :b y)}}
   [{[_$assoc $m] :children}]
   (let [{[$nested-assoc $nested-m & $nested-kvs] :children} $m]
     (when (and (u/list? $m)
                (u/symbol? $nested-assoc "assoc")
                (even? (count $nested-kvs)))
-      (u/reg-compression! $m $nested-assoc (str $nested-m " " (str/join " " $nested-kvs))))))
+      (u/reg-compression!
+       :compact-clj/assoc-remove-nested
+       $m
+       $nested-assoc
+       (str $nested-m " " (str/join " " $nested-kvs))))))
 
 (defn assoc->assoc-in
-  {:example {:in '(assoc m :a (assoc (:a m) :b x))
+  {:type :compact-clj/assoc->assoc-in
+   :example {:in '(assoc m :a (assoc (:a m) :b x))
              :out '(assoc-in m [:a :b] x)}}
   [{[$assoc $m $k $v] :children :as node}]
   (let [{[$v-assoc $v-m $v-k $v-v] :children} $v
@@ -40,7 +46,11 @@
                (u/symbol? $v-assoc "assoc")
                (u/list? $v-m)
                complex-pattern)
-      (u/reg-compression! node $assoc (str "(assoc-in " $m " [" $k " " $v-k "] " $v-v ")")))))
+      (u/reg-compression!
+       :compact-clj/assoc->assoc-in
+       node
+       $assoc
+       (str "(assoc-in " $m " [" $k " " $v-k "] " $v-v ")")))))
 
 (defn all [{:keys [node]}]
   (when (and (u/in-source? node) (legal? node))

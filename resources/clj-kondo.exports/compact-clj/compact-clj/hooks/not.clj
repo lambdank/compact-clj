@@ -7,7 +7,8 @@
   (u/count? node 2))
 
 (defn not->not=
-  {:example {:in '(not (= x y))
+  {:type :compact-clj/not->not=
+   :example {:in '(not (= x y))
              :out '(not= x y)}}
   [{:keys [children] :as node}]
   (let [[$not $x] children
@@ -15,10 +16,15 @@
     (when (and (u/list? $x)
                (u/symbol? $= "=")
                (seq $=-args))
-      (u/reg-compression! node $not (str "(not= " (str/join " " $=-args) ")")))))
+      (u/reg-compression!
+       :compact-clj/not->not=
+       node
+       $not
+       (str "(not= " (str/join " " $=-args) ")")))))
 
 (defn not->not-any?
-  {:example {:in '(not (some f coll))
+  {:type :compact-clj/not->not-any?
+   :example {:in '(not (some f coll))
              :out '(not-any? f coll)}}
   [{:keys [children] :as node}]
   (let [[$not $x] children
@@ -26,10 +32,15 @@
     (when (and (u/list? $x)
                (u/count? $x 3)
                (u/symbol? $some "some"))
-      (u/reg-compression! node $not (str "(not-any? " $pred " " $coll ")")))))
+      (u/reg-compression!
+       :compact-clj/not->not-any?
+       node
+       $not
+       (str "(not-any? " $pred " " $coll ")")))))
 
 (defn not->boolean
-  {:example {:in '(not (not x))
+  {:type :compact-clj/not->boolean
+   :example {:in '(not (not x))
              :out '(boolean x)}}
   [{:keys [children] :as node}]
   (let [[$not $x] children
@@ -37,10 +48,15 @@
     (when (and (u/list? $x)
                (u/count? $x 2)
                (u/symbol? $x-not "not"))
-      (u/reg-compression! node $not (str "(boolean " $x-x ")")))))
+      (u/reg-compression!
+       :compact-clj/not->boolean
+       node
+       $not
+       (str "(boolean " $x-x ")")))))
 
 (defn not->not-every?
-  {:example {:in '(not (every? pred coll))
+  {:type :compact-clj/not->not-every?
+   :example {:in '(not (every? pred coll))
              :out '(not-every? pred coll)}}
   [{:keys [children] :as node}]
   (let [[$not $x] children
@@ -48,10 +64,15 @@
     (when (and (u/list? $x)
                (u/count? $x 3)
                (u/symbol? $every? "every?"))
-      (u/reg-compression! node $not (str "(not-every? " $pred " " $coll ")")))))
+      (u/reg-compression!
+       :compact-clj/not->not-every?
+       node
+       $not
+       (str "(not-every? " $pred " " $coll ")")))))
 
 (defn not->seq
-  {:example {:in '(not (empty? coll))
+  {:type :compact-clj/not->seq
+   :example {:in '(not (empty? coll))
              :out '(seq coll)}}
   [{:keys [children] :as node}]
   (let [[$not $x] children
@@ -59,10 +80,11 @@
     (when (and (u/list? $x)
                (u/count? $x 2)
                (u/symbol? $empty? "empty?"))
-      (u/reg-compression! node $not (str "(seq " $coll ")")))))
+      (u/reg-compression! :compact-clj/not->seq node $not (str "(seq " $coll ")")))))
 
 (defn not->even?
-  {:example {:in '(not (odd? n))
+  {:type :compact-clj/not->even?
+   :example {:in '(not (odd? n))
              :out '(even? n)}}
   [{:keys [children] :as node}]
   (let [[$not $x] children
@@ -70,10 +92,11 @@
     (when (and (u/list? $x)
                (u/count? $x 2)
                (u/symbol? $odd? "odd?"))
-      (u/reg-compression! node $not (str "(even? " $n ")")))))
+      (u/reg-compression! :compact-clj/not->even? node $not (str "(even? " $n ")")))))
 
 (defn not->odd?
-  {:example {:in '(not (even? n))
+  {:type :compact-clj/not->odd?
+   :example {:in '(not (even? n))
              :out '(odd? n)}}
   [{:keys [children] :as node}]
   (let [[$not $x] children
@@ -81,10 +104,11 @@
     (when (and (u/list? $x)
                (u/count? $x 2)
                (u/symbol? $even? "even?"))
-      (u/reg-compression! node $not (str "(odd? " $n ")")))))
+      (u/reg-compression! :compact-clj/not->odd? node $not (str "(odd? " $n ")")))))
 
 (defn not->true?
-  {:example {:in '(not (false? x))
+  {:type :compact-clj/not->true?
+   :example {:in '(not (false? x))
              :out '(true? x)}}
   [{:keys [children] :as node}]
   (let [[$not $x] children
@@ -92,10 +116,11 @@
     (when (and (u/list? $x)
                (u/count? $x 2)
                (u/symbol? $false? "false?"))
-      (u/reg-compression! node $not (str "(true? " $x-x ")")))))
+      (u/reg-compression! :compact-clj/not->true? node $not (str "(true? " $x-x ")")))))
 
 (defn not->false?
-  {:example {:in '(not (true? x))
+  {:type :compact-clj/not->false?
+   :example {:in '(not (true? x))
              :out '(false? x)}}
   [{:keys [children] :as node}]
   (let [[$not $x] children
@@ -103,10 +128,11 @@
     (when (and (u/list? $x)
                (u/count? $x 2)
                (u/symbol? $true? "true?"))
-      (u/reg-compression! node $not (str "(false? " $x-x ")")))))
+      (u/reg-compression! :compact-clj/not->false? node $not (str "(false? " $x-x ")")))))
 
 (defn not->some?
-  {:example {:in '(not (nil? x))
+  {:type :compact-clj/not->some?
+   :example {:in '(not (nil? x))
              :out '(some? x)}}
   [{:keys [children] :as node}]
   (let [[$not $x] children
@@ -114,10 +140,11 @@
     (when (and (u/list? $x)
                (u/count? $x 2)
                (u/symbol? $nil? "nil?"))
-      (u/reg-compression! node $not (str "(some? " $x-x ")")))))
+      (u/reg-compression! :compact-clj/not->some? node $not (str "(some? " $x-x ")")))))
 
 (defn not->empty?
-  {:example {:in '(not (seq coll))
+  {:type :compact-clj/not->empty?
+   :example {:in '(not (seq coll))
              :out '(empty? coll)}}
   [{:keys [children] :as node}]
   (let [[$not $x] children
@@ -125,7 +152,7 @@
     (when (and (u/list? $x)
                (u/count? $x 2)
                (u/symbol? $seq "seq"))
-      (u/reg-compression! node $not (str "(empty? " $coll ")")))))
+      (u/reg-compression! :compact-clj/not->empty? node $not (str "(empty? " $coll ")")))))
 
 (defn all [{:keys [node]}]
   (when (and (u/in-source? node) (legal? node))

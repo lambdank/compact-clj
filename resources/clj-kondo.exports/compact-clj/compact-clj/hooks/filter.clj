@@ -6,7 +6,8 @@
   (u/count? node 3))
 
 (defn filter->remove
-  {:example {:in '(filter (fn [x] (not (f x))) coll)
+  {:type :compact-clj/filter->remove
+   :example {:in '(filter (fn [x] (not (f x))) coll)
              :out '(remove (fn [x] (f x)) coll)}}
   [{:keys [children] :as node}]
   (let [[$filter $pred $coll] children
@@ -16,7 +17,7 @@
       (and (u/list? $pred)
            (u/symbol? $pred-1 "complement")
            (u/count? $pred 2))
-      (u/reg-compression! node $filter (str "(remove " $pred-2 " " $coll ")"))
+      (u/reg-compression! :compact-clj/filter->remove node $filter (str "(remove " $pred-2 " " $coll ")"))
 
       ;; (filter #(not (pred %)) coll) -> (remove #(pred %) coll)
       (and (u/fn? $pred)
@@ -25,6 +26,7 @@
            (u/list? $pred-2)
            (not (u/empty? $pred-2)))
       (u/reg-compression!
+       :compact-clj/filter->remove
        node
        $filter
        (str "(remove #" $pred-2 " " $coll ")"))
@@ -37,12 +39,14 @@
            (u/symbol? (first (:children $pred-3)) "not")
            (u/count? $pred-3 2))
       (u/reg-compression!
+       :compact-clj/filter->remove
        node
        $filter
        (str "(remove (fn " $pred-2 " " (second (:children $pred-3)) ") " $coll ")")))))
 
 (defn filter->keep
-  {:example {:in '(filter some? (map f coll))
+  {:type :compact-clj/filter->keep
+   :example {:in '(filter some? (map f coll))
              :out '(keep f coll)}}
   [{:keys [children] :as node}]
   (let [[$filter $pred $coll] children
@@ -51,6 +55,7 @@
                (u/symbol? $map "map")
                (= 1 (count $colls)))
       (u/reg-compression!
+       :compact-clj/filter->keep
        node
        $filter
        (str "(keep " $f " " (first $colls) ")")))))

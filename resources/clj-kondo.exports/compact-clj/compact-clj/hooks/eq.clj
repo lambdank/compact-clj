@@ -7,25 +7,34 @@
   (pos? (count (:children node))))
 
 (defn =->true?
-  {:example {:in '(= x true)
+  {:type :compact-clj/=->true?
+   :example {:in '(= x true)
              :out '(true? x)}}
   [{:keys [children] :as node}]
   (let [[$= $x $y] children]
     (when (u/count? node 3)
-      (cond (u/symbol? $x "true") (u/reg-compression! node $= (str "(true? " $y ")"))
-            (u/symbol? $y "true") (u/reg-compression! node $= (str "(true? " $x ")"))))))
+      (cond (u/symbol? $x "true")
+            (u/reg-compression! :compact-clj/=->true? node $= (str "(true? " $y ")"))
+
+            (u/symbol? $y "true")
+            (u/reg-compression! :compact-clj/=->true? node $= (str "(true? " $x ")"))))))
 
 (defn =->nil?
-  {:example {:in '(= x nil)
+  {:type :compact-clj/=->nil?
+   :example {:in '(= x nil)
              :out '(nil? x)}}
   [{:keys [children] :as node}]
   (let [[$= $x $y] children]
     (when (u/count? node 3)
-      (cond (u/symbol? $x "nil") (u/reg-compression! node $= (str "(nil? " $y ")"))
-            (u/symbol? $y "nil") (u/reg-compression! node $= (str "(nil? " $x ")"))))))
+      (cond (u/symbol? $x "nil")
+            (u/reg-compression! :compact-clj/=->nil? node $= (str "(nil? " $y ")"))
+
+            (u/symbol? $y "nil")
+            (u/reg-compression! :compact-clj/=->nil? node $= (str "(nil? " $x ")"))))))
 
 (defn =->empty?
-  {:example {:in '(= 0 (count coll))
+  {:type :compact-clj/=->empty?
+   :example {:in '(= 0 (count coll))
              :out '(empty? coll)}}
   [{:keys [children] :as node}]
   (let [[$= $x $y] children
@@ -35,15 +44,16 @@
       (cond (and (u/symbol? $x "0")
                  (u/list? $y)
                  (u/symbol? $y-count "count"))
-            (u/reg-compression! node $= (str "(empty? " $y-coll ")"))
+            (u/reg-compression! :compact-clj/=->empty? node $= (str "(empty? " $y-coll ")"))
 
             (and (u/symbol? $y "0")
                  (u/list? $x)
                  (u/symbol? $x-count "count"))
-            (u/reg-compression! node $= (str "(empty? " $x-coll ")"))))))
+            (u/reg-compression! :compact-clj/=->empty? node $= (str "(empty? " $x-coll ")"))))))
 
 (defn =-remove-duplicate
-  {:example {:in '(= x x)
+  {:type :compact-clj/=-remove-duplicate
+   :example {:in '(= x x y)
              :out '(= x y)}}
   [{:keys [children] :as node}]
   (let [[$= & $args] children]
@@ -52,7 +62,11 @@
                           frequencies
                           (map second)
                           (filter #(< 1 %))))
-      (u/reg-compression! node $= (str "(= " (str/join " " (distinct (map u/->sexpr $args))) ")")))))
+      (u/reg-compression!
+       :compact-clj/=-remove-duplicate
+       node
+       $=
+       (str "(= " (str/join " " (distinct (map u/->sexpr $args))) ")")))))
 
 (defn all [{:keys [node]}]
   (when (and (u/in-source? node) (legal? node))

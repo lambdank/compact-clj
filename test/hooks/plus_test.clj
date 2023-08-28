@@ -14,7 +14,7 @@
                 :col 5
                 :end-col 6
                 :message (u/->msg "(+ x y)" "x y")
-                :type :lol})
+                :type :compact-clj/+-remove-nested})
          (hooks.plus/+-remove-nested (api/parse-string (-> #'hooks.plus/+-remove-nested meta :example :in str))))))
 
 (deftest +->inc-test

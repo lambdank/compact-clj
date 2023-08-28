@@ -14,7 +14,7 @@
           :col 9
           :end-col 14
           :message (u/->msg "(assoc m :a x)" "m :a x")
-          :type :lol}
+          :type :compact-clj/assoc-remove-nested}
          (hooks.assoc/assoc-remove-nested
           (api/parse-string (-> #'hooks.assoc/assoc-remove-nested meta :example :in str))))))
 

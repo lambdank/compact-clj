@@ -19,7 +19,7 @@
           :col col
           :end-col end-col
           :message (u/->msg (str in) (str out))
-          :type :lol}
+          :type (-> var-object meta :type)}
          ((deref var-object) (api/parse-string (str in))))))
 
 (defn mock-reg-finding [f]

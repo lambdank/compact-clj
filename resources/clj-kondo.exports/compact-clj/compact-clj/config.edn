@@ -1,5 +1,7 @@
 {:hooks {:analyze-call
          {clojure.core/= hooks.eq/all
+          clojure.core/- hooks.minus/all
+          clojure.core/+ hooks.plus/all
           clojure.core/and hooks.and/all
           clojure.core/assoc hooks.assoc/all
           clojure.core/conj hooks.conj/all
@@ -13,7 +15,69 @@
           clojure.core/or hooks.or/all
           clojure.core/vec hooks.vec/all
           clojure.core/when hooks.when/all
-          clojure.core/when-let hooks.when-let/all
-          clojure.core/- hooks.minus/all
-          clojure.core/+ hooks.plus/all}}
- :linters {:lol {:level :warning}}}
+          clojure.core/when-let hooks.when-let/all}}
+ :linters {:compact-clj/=->empty? {:level :warning}
+           :compact-clj/=->nil? {:level :warning}
+           :compact-clj/=->true? {:level :warning}
+           :compact-clj/=-remove-duplicate {:level :warning}
+
+           :compact-clj/-->dec {:level :warning}
+           :compact-clj/-->inc {:level :warning}
+
+           :compact-clj/+->dec {:level :warning}
+           :compact-clj/+->inc {:level :warning}
+           :compact-clj/+-remove-nested {:level :warning}
+
+           :compact-clj/and->every? {:level :warning}
+           :compact-clj/and-remove-nested {:level :warning} 
+
+           :compact-clj/assoc->assoc-in {:level :warning}
+           :compact-clj/assoc-remove-nested {:level :warning}
+
+           :compact-clj/conj-remove-nested {:level :warning}
+
+           :compact-clj/filter->keep {:level :warning}
+           :compact-clj/filter->remove {:level :warning}
+
+           :compact-clj/first->ffirst {:level :warning}
+           :compact-clj/first->second {:level :warning}
+
+           :compact-clj/if->boolean {:level :warning}
+           :compact-clj/if->cond-> {:level :warning}
+           :compact-clj/if->if-not {:level :warning}
+           :compact-clj/if->not {:level :warning}
+           :compact-clj/if->or {:level :warning}
+           :compact-clj/if->when {:level :warning}
+           :compact-clj/if-move-to-inner {:level :warning}
+
+           :compact-clj/into->set {:level :warning}
+           :compact-clj/into->vec {:level :warning}
+
+           :compact-clj/let->doto {:level :warning}
+           :compact-clj/let->if-let {:level :warning}
+           :compact-clj/let->when-let {:level :warning}
+
+           :compact-clj/map-remove-nested {:level :off}
+
+           :compact-clj/not->boolean {:level :warning}
+           :compact-clj/not->empty? {:level :warning}
+           :compact-clj/not->even? {:level :warning}
+           :compact-clj/not->false? {:level :warning}
+           :compact-clj/not->not= {:level :warning}
+           :compact-clj/not->not-any? {:level :warning}
+           :compact-clj/not->not-every? {:level :warning}
+           :compact-clj/not->odd? {:level :warning}
+           :compact-clj/not->seq {:level :warning}
+           :compact-clj/not->some? {:level :warning}
+           :compact-clj/not->true? {:level :warning}
+
+           :compact-clj/or->get {:level :warning}
+           :compact-clj/or->some {:level :warning}
+
+           :compact-clj/vec->filterv {:level :warning}
+           :compact-clj/vec->mapv {:level :warning}
+
+           :compact-clj/when->not-empty {:level :warning}
+           :compact-clj/when->when-not {:level :warning}
+
+           :compact-clj/when-let->when-first {:level :warning}}}

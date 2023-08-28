@@ -19,11 +19,11 @@
 (defn vector? [{:keys [tag]}]
   (= tag :vector))
 
-(defn reg-compression! [root-node highlight-node compression]
+(defn reg-compression! [tipe root-node highlight-node compression]
   (api/reg-finding!
    (assoc (meta highlight-node)
           :message (->msg root-node compression)
-          :type :lol)))
+          :type tipe)))
 
 (defn set? [{:keys [tag]}]
   (= tag :set))
