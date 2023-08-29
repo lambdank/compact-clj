@@ -138,6 +138,12 @@ You might need to ignore this in your git projects, if you are the only one usin
 (map f (map g coll)) -> (map (comp f g) coll)
 ```
 
+## `max`
+```clojure
+;; remove nested maxs
+(max (max x y) z) -> (max x y z)
+```
+
 ## `not`
 ```clojure
 ;; not -> not=
