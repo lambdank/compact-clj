@@ -12,7 +12,7 @@
              :out '(vec '(x y z))}}
   [{:keys [children] :as node}]
   (let [[$into $to $from] children]
-    (when (and (every-pred u/empty? u/vector?) $to)
+    (when ((every-pred u/empty? u/vector?) $to)
       (u/reg-compression! :compact-clj/into->vec node $into (str "(vec " $from ")")))))
 
 (defn into->set
@@ -21,7 +21,7 @@
              :out '(set [x y z])}}
   [{:keys [children] :as node}]
   (let [[$into $to $from] children]
-    (when (and (every-pred u/empty? u/set?) $to)
+    (when ((every-pred u/empty? u/set?) $to)
       (u/reg-compression! :compact-clj/into->set node $into (str "(set " $from ")")))))
 
 (defn all [{:keys [node]}]
