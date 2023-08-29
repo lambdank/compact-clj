@@ -76,6 +76,7 @@
 
            :compact-clj/or->get {:level :warning}
            :compact-clj/or->some {:level :warning}
+           :compact-clj/or-remove-nested {:level :warning}
 
            :compact-clj/vec->filterv {:level :warning}
            :compact-clj/vec->mapv {:level :warning}

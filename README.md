@@ -160,6 +160,8 @@ You might need to ignore this in your git projects, if you are the only one usin
 
 ## `or`
 ```clojure
+;; remove nested ors
+(or (or x y) z) -> (or x y z)
 ;; or -> some
 (or (f x) (f y)) -> (some f [x y])
 ;; or -> get

@@ -7,6 +7,21 @@
   ;; `or` with one argument is already linted by clj-kondo.
   (<= 2 (count children)))
 
+(defn or-remove-nested
+  {:type :compact-clj/or-remove-nested
+   :example {:in '(or (or x y) z)
+             :out '(or x y z)}}
+  [{[_$and & $args] :children}]
+  (->> $args
+       (u/associative-lift #(u/symbol? % "or"))
+       (map (fn [[nested-node $nested-and $nested-args]]
+              (u/reg-compression!
+               :compact-clj/or-remove-nested
+               nested-node
+               $nested-and
+               (str/join " " $nested-args))))
+       seq))
+
 (defn or->some
   {:type :compact-clj/or->some
    :example {:in '(or (f x) (f y))
@@ -46,4 +61,4 @@
 
 (defn all [{:keys [node]}]
   (when (and (u/in-source? node) (legal? node))
-    ((juxt or->some or->get) node)))
+    ((juxt or-remove-nested or->some or->get) node)))
