@@ -8,7 +8,7 @@
           clojure.core/filter hooks.filter/all
           clojure.core/first hooks.first/all
           clojure.core/if hooks.if/all
-          clojure.core/into hooks.not/all
+          clojure.core/into hooks.into/all
           clojure.core/let hooks.let/all
           clojure.core/map hooks.map/all
           clojure.core/not hooks.not/all
