@@ -56,3 +56,8 @@
   Useful for removing linting errors in macro-expansions."
   [node]
   (= 4 (count (select-keys (meta (first (:children node))) [:col :end-col :row :end-row]))))
+
+(defn associative-lift [f-pred args & {:keys [min-args] :or {min-args 1}}]
+  (keep (fn [{[$f & args] :children :as node}]
+          (when (and (list? node) (f-pred $f) (<= min-args (count args)))
+            [node $f args])) args))

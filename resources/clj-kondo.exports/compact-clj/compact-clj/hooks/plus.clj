@@ -12,15 +12,13 @@
              :out '(+ x y z)}}
   [{[_$+ & $args] :children}]
   (->> $args
-       (keep (fn [{[$nested-+ & $nested-args] :children :as nested-+-node}]
-               (when (and (u/list? nested-+-node)
-                          (u/symbol? $nested-+ "+")
-                          (<= 2 (count (:children nested-+-node))))
-                 (u/reg-compression!
-                  :compact-clj/+-remove-nested
-                  nested-+-node
-                  $nested-+
-                  (str/join " " $nested-args)))))
+       (u/associative-lift #(u/symbol? % "+"))
+       (map (fn [[nested-node $nested-and $nested-args]]
+              (u/reg-compression!
+               :compact-clj/+-remove-nested
+               nested-node
+               $nested-and
+               (str/join " " $nested-args))))
        seq))
 
 (defn +->inc

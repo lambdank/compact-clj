@@ -13,11 +13,13 @@
              :out '(and x y z)}}
   [{[_$and & $args] :children}]
   (->> $args
-       (keep (fn [{[$nested-and & $nested-args] :children :as nested-and-node}]
-               (when (and (u/list? nested-and-node)
-                          (u/symbol? $nested-and "and")
-                          (<= 2 (count (:children nested-and-node))))
-                 (u/reg-compression! :compact-clj/and-remove-nested nested-and-node $nested-and (str/join " " $nested-args)))))
+       (u/associative-lift #(u/symbol? % "and"))
+       (map (fn [[nested-node $nested-and $nested-args]]
+              (u/reg-compression!
+               :compact-clj/and-remove-nested
+               nested-node
+               $nested-and
+               (str/join " " $nested-args))))
        seq))
 
 (defn and->every?
