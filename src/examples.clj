@@ -51,6 +51,8 @@
 
 (max (max x y) z)
 
+(min (min x y) z)
+
 (not (= x y))
 (not (some f coll))
 (not (not x))

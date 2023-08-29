@@ -144,6 +144,12 @@ You might need to ignore this in your git projects, if you are the only one usin
 (max (max x y) z) -> (max x y z)
 ```
 
+## `min`
+```clojure
+;; remove nested mins
+(min (min x y) z) -> (min x y z)
+```
+
 ## `not`
 ```clojure
 ;; not -> not=

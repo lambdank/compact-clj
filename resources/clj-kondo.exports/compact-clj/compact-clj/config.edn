@@ -13,6 +13,7 @@
           clojure.core/let hooks.let/all
           clojure.core/map hooks.map/all
           clojure.core/max hooks.max/all
+          clojure.core/min hooks.min/all
           clojure.core/not hooks.not/all
           clojure.core/or hooks.or/all
           clojure.core/vec hooks.vec/all
@@ -68,6 +69,8 @@
            :compact-clj/map-remove-nested {:level :off}
 
            :compact-clj/max-remove-nested {:level :warning}
+
+           :compact-clj/min-remove-nested {:level :warning}
 
            :compact-clj/not->boolean {:level :warning}
            :compact-clj/not->empty? {:level :warning}
