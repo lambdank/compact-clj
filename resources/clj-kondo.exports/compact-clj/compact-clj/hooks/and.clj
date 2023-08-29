@@ -24,6 +24,7 @@
 
 (defn and->every?
   {:type :compact-clj/and->every?
+   :unsafe [:logical->boolean]
    :example {:in '(and (f x) (f y))
              :out '(every? f [x y])}}
   [{[$and {[$pred $x] :children} & $args] :children :as node}]

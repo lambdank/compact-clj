@@ -31,7 +31,7 @@
            :compact-clj/+->inc {:level :warning}
            :compact-clj/+-remove-nested {:level :warning}
 
-           :compact-clj/and->every? {:level :warning}
+           :compact-clj/and->every? {:level :info}
            :compact-clj/and-remove-nested {:level :warning} 
 
            :compact-clj/assoc->assoc-in {:level :warning}
