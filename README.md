@@ -67,6 +67,12 @@ You might need to ignore this in your git projects, if you are the only one usin
 (assoc m k (f (k m))) -> (update m k f)
 ```
 
+## `comp`
+```clojure
+;; remove nested comps
+(comp (comp f g) h) -> (comp (comp f g) h)
+```
+
 ## `conj`
 ```clojure
 ;; remove nested conjs

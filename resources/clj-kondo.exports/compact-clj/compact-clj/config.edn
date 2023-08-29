@@ -4,6 +4,7 @@
           clojure.core/+ hooks.plus/all
           clojure.core/and hooks.and/all
           clojure.core/assoc hooks.assoc/all
+          clojure.core/comp hooks.comp/all
           clojure.core/conj hooks.conj/all
           clojure.core/filter hooks.filter/all
           clojure.core/first hooks.first/all
@@ -35,6 +36,8 @@
            :compact-clj/assoc->assoc-in {:level :warning}
            :compact-clj/assoc->update {:level :warning}
            :compact-clj/assoc-remove-nested {:level :warning}
+
+           :compact-clj/comp-remove-nested {:level :warning}
 
            :compact-clj/conj-remove-nested {:level :warning}
 
