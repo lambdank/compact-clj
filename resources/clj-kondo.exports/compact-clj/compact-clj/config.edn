@@ -22,6 +22,7 @@
            :compact-clj/=->nil? {:level :warning}
            :compact-clj/=->true? {:level :warning}
            :compact-clj/=-remove-duplicate {:level :warning}
+           :compact-clj/=-remove-nested {:level :warning}
 
            :compact-clj/-->dec {:level :warning}
            :compact-clj/-->inc {:level :warning}

@@ -6,6 +6,7 @@
 (= x nil)
 (= 0 (count coll))
 (= x x y)
+(= (= x y) z)
 
 (- n -1)
 (- n 1)

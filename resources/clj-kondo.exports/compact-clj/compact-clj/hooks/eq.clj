@@ -6,6 +6,21 @@
 (defn- legal? [node]
   (pos? (count (:children node))))
 
+(defn =-remove-nested
+  {:type :compact-clj/=-remove-nested
+   :example {:in '(= (= x y) z)
+             :out '(= x y z)}}
+  [{[_$comp & $args] :children}]
+  (->> $args
+       (u/associative-lift #(u/symbol? % "="))
+       (map (fn [[nested-node $nested-and $nested-args]]
+              (u/reg-compression!
+               :compact-clj/=-remove-nested
+               nested-node
+               $nested-and
+               (str/join " " $nested-args))))
+       seq))
+
 (defn =->true?
   {:type :compact-clj/=->true?
    :example {:in '(= x true)
@@ -70,4 +85,4 @@
 
 (defn all [{:keys [node]}]
   (when (and (u/in-source? node) (legal? node))
-    ((juxt =->true? =->nil? =->empty? =-remove-duplicate) node)))
+    ((juxt =->true? =->nil? =->empty? =-remove-duplicate =-remove-nested) node)))
