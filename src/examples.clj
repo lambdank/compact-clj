@@ -1,6 +1,6 @@
 (ns examples)
 
-(declare x y z n m t f g xs coll pred)
+(declare x y z n m k t f g xs coll pred)
 
 (= x true)
 (= x nil)
@@ -19,6 +19,7 @@
 
 (assoc (assoc m :a x) :b y)
 (assoc m :a (assoc (:a m) :b x))
+(assoc m k (f (k m) x y z))
 
 (conj (conj coll x) y)
 

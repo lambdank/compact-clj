@@ -33,6 +33,7 @@
            :compact-clj/and-remove-nested {:level :warning} 
 
            :compact-clj/assoc->assoc-in {:level :warning}
+           :compact-clj/assoc->update {:level :warning}
            :compact-clj/assoc-remove-nested {:level :warning}
 
            :compact-clj/conj-remove-nested {:level :warning}

@@ -52,7 +52,38 @@
        $assoc
        (str "(assoc-in " $m " [" $k " " $v-k "] " $v-v ")")))))
 
+(defn assoc->update
+  {:type :compact-clj/assoc->update
+   :example {:in '(assoc m k (f (k m)))
+             :out '(update m k f)}}
+  [{[$assoc $m $k $v] :children :as node}]
+  (let [[$f $x & $args] (:children $v)]
+    (when (and (u/list? $v)
+               (u/count? node 4)
+               (u/list? $x)
+               (or (let [[$get $nested-m $nested-k] (:children $x)]
+                     (and (u/count? $x 3)
+                          (u/symbol? $get "get")
+                          (u/code= $nested-m $m)
+                          (u/code= $nested-k $k)))
+                   (let [[$nested-k $nested-m] (:children $x)]
+                     (and (u/count? $x 2)
+                          (u/code= $nested-m $m)
+                          (u/code= $nested-k $k)))
+                   (let [[$nested-m $nested-k] (:children $x)]
+                     (and (u/count? $x 2)
+                          (u/code= $nested-m $m)
+                          (u/code= $nested-k $k)))))
+      (u/reg-compression!
+       :compact-clj/assoc->update
+       node
+       $assoc
+       (str "(update " $m " " $k " "
+            (if (seq $args)
+              (str "(" $f " " (str/join " " $args) ")")
+              $f)
+            ")")))))
+
 (defn all [{:keys [node]}]
   (when (and (u/in-source? node) (legal? node))
-    ((juxt assoc->assoc-in assoc-remove-nested) node)))
-
+    ((juxt assoc->assoc-in assoc-remove-nested assoc->update) node)))

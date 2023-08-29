@@ -63,6 +63,8 @@ You might need to ignore this in your git projects, if you are the only one usin
 (assoc (assoc m :a x) :b y) -> (assoc m :a x :b y)
 ;; assoc -> assoc-in
 (assoc m :a (assoc (:a m) :b x)) -> (assoc-in m [:a :b] x)
+;; assoc -> update
+(assoc m k (f (k m))) -> (update m k f)
 ```
 
 ## `conj`

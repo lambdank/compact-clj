@@ -24,3 +24,12 @@
                                                    :in '(assoc m :a (assoc (m :a) :b x))})
   (tu/test-example! #'hooks.assoc/assoc->assoc-in {:col 2 :end-col 7
                                                    :in '(assoc m :a (assoc (get m :a) :b x))}))
+(deftest assoc->update-test
+  (tu/test-example! #'hooks.assoc/assoc->update {:col 2 :end-col 7})
+  (tu/test-example! #'hooks.assoc/assoc->update {:col 2 :end-col 7
+                                                 :in '(assoc m k (f (m k)))})
+  (tu/test-example! #'hooks.assoc/assoc->update {:col 2 :end-col 7
+                                                 :in '(assoc m k (f (get m k)))})
+  (tu/test-example! #'hooks.assoc/assoc->update {:col 2 :end-col 7
+                                                 :in '(assoc m k (f (m k) x y z))
+                                                 :out '(update m k (f x y z))}))
