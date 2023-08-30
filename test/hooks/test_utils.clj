@@ -2,7 +2,8 @@
   (:require
    [clj-kondo.hooks-api :as api]
    [clojure.test :refer [is]]
-   [hooks.utils :as u]))
+   [hooks.utils :as u]
+   [malli.generator :as mg]))
 
 (defn test-example!
   "Tests the rule using `in` and `out`.
@@ -15,6 +16,11 @@
     (is (= (str in) (str root-node)))
     (is (= (str out) compression))))
 
+(defn equivalent? [rule input]
+  (let [output (-> input api/parse-string rule)]
+    (when (contains? output :compression)
+      (= (load-string input)
+         (load-string (:compression output))))))
 
 (defn mock-reg-compression [f]
   (with-redefs [u/reg-compression! (fn [tipe root-node highlight-node compression]
@@ -24,3 +30,14 @@
                                       :compression compression})]
     (f)))
 
+(def custom-registry
+  {::seq-not-symbol [:sequential {:min 0 :max 10} ::not-symbol]
+   ::not-symbol [:or :nil :int :string :int :double :boolean
+                 :keyword :qualified-keyword :uuid]
+   ::var [:re #"([a-z]|[A-Z]|-)+"]})
+
+(defn generator [schema & {:as opts}]
+  (mg/generator
+   [:schema {:registry custom-registry}
+    schema]
+   opts))

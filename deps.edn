@@ -8,5 +8,7 @@
                     "--middleware" "[cider.nrepl/cider-middleware]"
                     "--interactive"]}
   :test {:extra-paths ["src" "test"]
-         :extra-deps {lambdaisland/kaocha {:mvn/version "1.85.1342"}}
+         :extra-deps {lambdaisland/kaocha {:mvn/version "1.85.1342"}
+                      metosin/malli {:mvn/version "0.11.0"}
+                      com.gfredericks/test.chuck {:mvn/version "0.2.13"}}
          :main-opts ["-m" "kaocha.runner"]}}}
