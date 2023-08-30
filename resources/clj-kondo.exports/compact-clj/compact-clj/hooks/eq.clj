@@ -81,7 +81,16 @@
        :compact-clj/=-remove-duplicate
        node
        $=
-       (str "(= " (str/join " " (distinct (map u/->sexpr $args))) ")")))))
+       (str "(= " (->> $args
+                       (reduce (fn [[acc sexprs] x]
+                                 (let [x-sexpr (u/->sexpr x)]
+                                   (if (contains? sexprs x-sexpr)
+                                     [acc sexprs]
+                                     [(conj acc x) (conj sexprs x-sexpr)])))
+                               [[] #{}])
+                       first
+                       (str/join " " ))
+            ")")))))
 
 (defn all [{:keys [node]}]
   (when (and (u/in-source? node) (legal? node))
