@@ -4,16 +4,16 @@
    [hooks.let]
    [hooks.test-utils :as tu]))
 
-(use-fixtures :once tu/mock-reg-finding)
+(use-fixtures :once tu/mock-reg-compression)
 
 (deftest let->doto-test
-  (tu/test-example! #'hooks.let/let->doto {:col 2 :end-col 5}))
+  (tu/test-example! #'hooks.let/let->doto))
 
 (deftest let->when-let-test
-  (tu/test-example! #'hooks.let/let->when-let {:col 2 :end-col 5}))
+  (tu/test-example! #'hooks.let/let->when-let))
 
 (deftest let->if-let-test
-  (tu/test-example! #'hooks.let/let->if-let {:col 2 :end-col 5}))
+  (tu/test-example! #'hooks.let/let->if-let))
 
 (deftest let->when-some-test
-  (tu/test-example! #'hooks.let/let->when-some {:col 2 :end-col 5}))
+  (tu/test-example! #'hooks.let/let->when-some))

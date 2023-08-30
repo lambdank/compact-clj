@@ -4,7 +4,7 @@
    [hooks.test-utils :as tu]
    [hooks.when-some]))
 
-(use-fixtures :once tu/mock-reg-finding)
+(use-fixtures :once tu/mock-reg-compression)
 
 (deftest when-some->some->-test
-  (tu/test-example! #'hooks.when-some/when-some->some-> {:col 2 :end-col 11}))
+  (tu/test-example! #'hooks.when-some/when-some->some->))

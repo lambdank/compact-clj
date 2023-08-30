@@ -4,10 +4,10 @@
    [hooks.test-utils :as tu]
    [hooks.when]))
 
-(use-fixtures :once tu/mock-reg-finding)
+(use-fixtures :once tu/mock-reg-compression)
 
 (deftest when->when-not-test
-  (tu/test-example! #'hooks.when/when->when-not {:col 2 :end-col 6}))
+  (tu/test-example! #'hooks.when/when->when-not))
 
 (deftest when->not-empty-test
-  (tu/test-example! #'hooks.when/when->not-empty {:col 2 :end-col 6}))
+  (tu/test-example! #'hooks.when/when->not-empty))

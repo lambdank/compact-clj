@@ -3,24 +3,20 @@
    [clj-kondo.hooks-api :as api]
    [clojure.test :refer [deftest use-fixtures is]]
    [hooks.or]
-   [hooks.test-utils :as tu]
-   [hooks.utils :as u]))
+   [hooks.test-utils :as tu]))
 
-(use-fixtures :once tu/mock-reg-finding)
+(use-fixtures :once tu/mock-reg-compression)
 
 (deftest or-remove-nested-test
-  (is (= (list {:row 1
-                :end-row 1
-                :col 6
-                :end-col 8
-                :message (u/->msg "(or x y)" "x y")
+  (is (= (list {:root-node "(or x y)"
+                :compression "x y"
                 :type :compact-clj/or-remove-nested})
-         (hooks.or/or-remove-nested (api/parse-string (-> #'hooks.or/or-remove-nested meta :example :in str))))))
+         (->> (-> #'hooks.or/or-remove-nested meta :example :in str api/parse-string hooks.or/or-remove-nested)
+              (map #(dissoc % :highlight-node))))))
 
 (deftest or->some-test
-  (tu/test-example! #'hooks.or/or->some {:col 2 :end-col 4}))
+  (tu/test-example! #'hooks.or/or->some))
 
 (deftest or->get-test
-  (tu/test-example! #'hooks.or/or->get {:col 2 :end-col 4})
-  (tu/test-example! #'hooks.or/or->get {:col 2 :end-col 4
-                                        :in '(or (get m k) x)}))
+  (tu/test-example! #'hooks.or/or->get)
+  (tu/test-example! #'hooks.or/or->get {:in '(or (get m k) x)}))

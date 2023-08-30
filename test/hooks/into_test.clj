@@ -4,10 +4,10 @@
    [hooks.into]
    [hooks.test-utils :as tu]))
 
-(use-fixtures :once tu/mock-reg-finding)
+(use-fixtures :once tu/mock-reg-compression)
 
 (deftest into->set-test
-  (tu/test-example! #'hooks.into/into->set {:col 2 :end-col 6}))
+  (tu/test-example! #'hooks.into/into->set))
 
 (deftest into->vec-test
-  (tu/test-example! #'hooks.into/into->vec {:col 2 :end-col 6}))
+  (tu/test-example! #'hooks.into/into->vec))

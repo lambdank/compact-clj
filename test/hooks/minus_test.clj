@@ -4,10 +4,10 @@
    [hooks.minus]
    [hooks.test-utils :as tu]))
 
-(use-fixtures :once tu/mock-reg-finding)
+(use-fixtures :once tu/mock-reg-compression)
 
 (deftest -->inc-test
-  (tu/test-example! #'hooks.minus/-->inc {:col 2 :end-col 3}))
+  (tu/test-example! #'hooks.minus/-->inc))
 
 (deftest -->dec
-  (tu/test-example! #'hooks.minus/-->dec {:col 2 :end-col 3}))
+  (tu/test-example! #'hooks.minus/-->dec))

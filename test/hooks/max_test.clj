@@ -3,17 +3,13 @@
    [clj-kondo.hooks-api :as api]
    [clojure.test :refer [deftest use-fixtures is]]
    [hooks.max]
-   [hooks.test-utils :as tu]
-   [hooks.utils :as u]))
+   [hooks.test-utils :as tu]))
 
-(use-fixtures :once tu/mock-reg-finding)
+(use-fixtures :once tu/mock-reg-compression)
 
 (deftest max-remove-nested-test
-  (is (= (list {:row 1
-                :end-row 1
-                :col 7
-                :end-col 10
-                :message (u/->msg "(max x y)" "x y")
+  (is (= (list {:root-node "(max x y)"
+                :compression "x y"
                 :type :compact-clj/max-remove-nested})
-         (hooks.max/max-remove-nested (api/parse-string (-> #'hooks.max/max-remove-nested meta :example :in str))))))
-
+         (->> (-> #'hooks.max/max-remove-nested meta :example :in str api/parse-string hooks.max/max-remove-nested)
+              (map #(dissoc % :highlight-node))))))

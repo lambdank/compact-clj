@@ -7,21 +7,20 @@
 (defn test-example!
   "Tests the rule using `in` and `out`.
   Uses metadata example of rule if `in` and `out` are not provided provided."
-  [var-object {:keys [col end-col
-                      row end-row
-                      in out]
-               :or {row 1
-                    end-row 1
-                    in (-> var-object meta :example :in)
-                    out (-> var-object meta :example :out)}}]
-  (is (= {:row row
-          :end-row end-row
-          :col col
-          :end-col end-col
-          :message (u/->msg (str in) (str out))
-          :type (-> var-object meta :type)}
-         ((deref var-object) (api/parse-string (str in))))))
+  [var-object & {:keys [in out]
+                 :or {in (-> var-object meta :example :in)
+                      out (-> var-object meta :example :out)}}]
+  (let [{:keys [type compression root-node]} ((deref var-object) (api/parse-string (str in)))]
+    (is (= type (:type (meta var-object))))
+    (is (= (str in) (str root-node)))
+    (is (= (str out) compression))))
 
-(defn mock-reg-finding [f]
-  (with-redefs [api/reg-finding! identity]
+
+(defn mock-reg-compression [f]
+  (with-redefs [u/reg-compression! (fn [tipe root-node highlight-node compression]
+                                     {:type tipe
+                                      :root-node (str root-node)
+                                      :highlight-node (str highlight-node)
+                                      :compression compression})]
     (f)))
+
