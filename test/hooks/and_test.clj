@@ -22,7 +22,7 @@
                                   [:= 'not]])
                  x (tu/generator [:sequential {:min 2 :max 10} ::tu/not-symbol])]
                 (let [input (str (cons 'and (map (fn [y] `(~f ~y)) x)))]
-                  (tu/equivalent? hooks.and/and->every? input {:f-in boolean}))))
+                  (tu/equivalent? hooks.and/and->every? input {:in-post boolean}))))
 
 (deftest and->every?
   (tu/test-example! #'hooks.and/and->every?)

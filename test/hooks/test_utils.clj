@@ -16,13 +16,15 @@
     (is (= (str in) (str root-node)))
     (is (= (str out) compression))))
 
-(defn equivalent? [rule input & {:keys [f-out f-in]
-                                 :or {f-out identity
-                                      f-in identity}}]
+(defn equivalent? [rule input & {:keys [out-pre out-post in-pre in-post ]
+                                 :or {out-pre identity
+                                      out-post identity
+                                      in-pre identity
+                                      in-post identity}}]
   (let [output (-> input api/parse-string rule)]
     (when (contains? output :compression)
-      (= (f-in (load-string input))
-         (f-out (load-string (:compression output)))))))
+      (= (in-post (load-string (in-pre input)))
+         (out-post (load-string (out-pre (:compression output))))))))
 
 (defn mock-reg-compression [f]
   (with-redefs [u/reg-compression! (fn [tipe root-node highlight-node compression]

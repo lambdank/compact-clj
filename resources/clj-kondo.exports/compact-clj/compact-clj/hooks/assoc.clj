@@ -78,11 +78,7 @@
        :compact-clj/assoc->update
        node
        $assoc
-       (str "(update " $m " " $k " "
-            (if (seq $args)
-              (str "(" $f " " (str/join " " $args) ")")
-              $f)
-            ")")))))
+       (str "(update " $m " " $k " " (cond-> $f (seq $args) (str " " (str/join " " $args))) ")")))))
 
 (defn all [{:keys [node]}]
   (when (and (u/in-source? node) (legal? node))
