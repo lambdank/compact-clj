@@ -94,6 +94,6 @@
            :compact-clj/when->not-empty {:level :warning}
            :compact-clj/when->when-not {:level :warning}
 
-           :compact-clj/when-let->when-first {:level :warning}
+           :compact-clj/when-let->when-first {:level :off}
 
            :compact-clj/when-some->some-> {:level :warning}}}
