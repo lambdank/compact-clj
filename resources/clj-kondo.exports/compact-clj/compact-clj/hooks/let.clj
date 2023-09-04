@@ -16,10 +16,11 @@
         [$key $value] (:children $bindings)
         exprs-wihout-last (drop-last $exprs)]
     (when (and (u/count? $bindings 2)
+               (< 1 (count $exprs))
                (= (last $exprs) $key)
                (every? #(= (second (:children %)) $key) exprs-wihout-last))
       (let [modified-exprs (map #(update % :children (fn [[$f _$key & $args]]
-                                                       (into (list $f) $args)))
+                                                       (list* $f $args)))
                                 exprs-wihout-last)]
         (u/reg-compression!
          :compact-clj/let->doto
