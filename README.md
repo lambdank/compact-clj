@@ -166,10 +166,6 @@ You might need to ignore this in your git projects, if you are the only one usin
 (not (even? n)) -> (odd? n)
 ;; not -> even?
 (not (odd? n)) -> (even? n)
-;; not -> true?
-(not (false? x)) -> (true? x)
-;; not -> false?
-(not (true? x)) -> (false? x)
 ;; not -> some?
 (not (nil? x)) -> (some? x)
 ;; not -> empty?

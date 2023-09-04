@@ -60,8 +60,6 @@
 (not (empty? coll))
 (not (even? n))
 (not (odd? n))
-(not (false? x))
-(not (true? x))
 (not (nil? x))
 (not (seq coll))
 

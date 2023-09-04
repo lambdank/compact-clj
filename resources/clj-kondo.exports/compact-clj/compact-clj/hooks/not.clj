@@ -107,30 +107,6 @@
                (u/symbol? $even? "even?"))
       (u/reg-compression! :compact-clj/not->odd? node $not (str "(odd? " $n ")")))))
 
-(defn not->true?
-  {:type :compact-clj/not->true?
-   :example {:in '(not (false? x))
-             :out '(true? x)}}
-  [{:keys [children] :as node}]
-  (let [[$not $x] children
-        [$false? $x-x] (:children $x)]
-    (when (and (u/list? $x)
-               (u/count? $x 2)
-               (u/symbol? $false? "false?"))
-      (u/reg-compression! :compact-clj/not->true? node $not (str "(true? " $x-x ")")))))
-
-(defn not->false?
-  {:type :compact-clj/not->false?
-   :example {:in '(not (true? x))
-             :out '(false? x)}}
-  [{:keys [children] :as node}]
-  (let [[$not $x] children
-        [$true? $x-x] (:children $x)]
-    (when (and (u/list? $x)
-               (u/count? $x 2)
-               (u/symbol? $true? "true?"))
-      (u/reg-compression! :compact-clj/not->false? node $not (str "(false? " $x-x ")")))))
-
 (defn not->some?
   {:type :compact-clj/not->some?
    :example {:in '(not (nil? x))
@@ -158,5 +134,4 @@
 (defn all [{:keys [node]}]
   (when (and (u/in-source? node) (legal? node))
     ((juxt not->not= not->not-any? not->boolean not->not-every?
-           not->seq not->even? not->odd? not->true? not->false?
-           not->some? not->empty?) node)))
+           not->seq not->even? not->odd? not->some? not->empty?) node)))

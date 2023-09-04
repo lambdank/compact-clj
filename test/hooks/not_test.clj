@@ -71,12 +71,6 @@
   (tu/test-example! #'hooks.not/not->even?)
   (is (:pass? (tc/quick-check 100 not->even?-equivalent-property))))
 
-(deftest not->true?-test
-  (tu/test-example! #'hooks.not/not->true?))
-
-(deftest not->false?-test
-  (tu/test-example! #'hooks.not/not->false?))
-
 (def not->some?-equivalent-property
   (prop/for-all [x (tu/generator ::tu/not-symbol)]
                 (let [input (str `(~'not (~'nil? ~x)))]
