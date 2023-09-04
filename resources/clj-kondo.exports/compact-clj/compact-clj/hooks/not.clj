@@ -72,6 +72,7 @@
 
 (defn not->seq
   {:type :compact-clj/not->seq
+   :unsafe [:boolean->logical]
    :example {:in '(not (empty? coll))
              :out '(seq coll)}}
   [{:keys [children] :as node}]
