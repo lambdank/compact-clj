@@ -64,7 +64,6 @@
 (not (seq coll))
 
 (or (f x) (f y))
-(or (:a x) y)
 (or (or x y) z)
 
 (vec (map f coll))

@@ -31,6 +31,3 @@
   (tu/test-example! #'hooks.or/or->some)
   (is (:pass? (tc/quick-check 100 or->some-equivalent-property))))
 
-(deftest or->get-test
-  (tu/test-example! #'hooks.or/or->get)
-  (tu/test-example! #'hooks.or/or->get {:in '(or (get m k) x)}))
