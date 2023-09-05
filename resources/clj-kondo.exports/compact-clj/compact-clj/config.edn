@@ -8,6 +8,7 @@
           clojure.core/conj hooks.conj/all
           clojure.core/filter hooks.filter/all
           clojure.core/first hooks.first/all
+          clojure.core/get hooks.get/all
           clojure.core/if hooks.if/all
           clojure.core/into hooks.into/all
           clojure.core/let hooks.let/all

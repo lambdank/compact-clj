@@ -96,6 +96,12 @@ You might need to ignore this in your git projects, if you are the only one usin
 (first (next coll)) -> (second coll)
 ```
 
+## `get`
+```clojure
+;; get -> kw
+(get m :a x) -> (:a m x)
+```
+
 ## `if`
 ```clojure
 ;; if -> if-not

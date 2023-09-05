@@ -32,6 +32,8 @@
 (first (first coll))
 (first (next coll))
 
+(get {} :a x)
+
 (if (not t) x y)
 (if t x nil)
 (if t true false)
