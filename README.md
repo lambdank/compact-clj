@@ -186,6 +186,8 @@ You might need to ignore this in your git projects, if you are the only one usin
 (or (f x) (f y)) -> (some f [x y])
 ;; or -> get
 (or (:a x) y) -> (:a x y)
+;; or -> contains?
+(or (= x y) (= x z)) -> (contains? #{y z} x)
 ```
 
 ## `vec`

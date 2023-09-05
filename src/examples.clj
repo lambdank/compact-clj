@@ -67,6 +67,7 @@
 
 (or (f x) (f y))
 (or (or x y) z)
+(or (= x y) (= x z))
 
 (vec (map f coll))
 (vec (filter pred coll))

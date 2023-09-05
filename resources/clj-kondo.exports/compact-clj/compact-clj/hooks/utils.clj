@@ -28,6 +28,9 @@
 (defn set? [{:keys [tag]}]
   (= tag :set))
 
+(defn ->set [children]
+  (api/set-node children))
+
 (defn count? [{:keys [children]} size]
   (= size (count children)))
 

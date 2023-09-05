@@ -39,6 +39,44 @@
        $or
        (str "(some " $pred " [" (str/join " " (map (comp second :children) $args)) "])")))))
 
+(defn or->contains?
+  {:type :compact-clj/or->contains?
+   :example {:in '(or (= x y) (= x z))
+             :out '(contains? #{y z} x)}}
+  [{:keys [children] :as node}]
+  (let [[$or & $args] children
+        [_ $y $z] (:children (first $args))
+        =-pairs (map #(rest (:children %)) $args)]
+    (when (and
+           (< 1 (count $args))
+           (every? (fn [{[$=] :children :as $arg}]
+                     (and (u/list? $arg)
+                          (u/count? $arg 3)
+                          (u/symbol? $= "="))) (rest $args)))
+      (cond (every? #(some (partial u/code= $y) %) =-pairs)
+            (u/reg-compression!
+             :compact-clj/or->contains?
+             node
+             $or
+             (str "(contains? "
+                  (->> =-pairs
+                       (map (fn [[x y]] (if (= x $y) y x)))
+                       distinct
+                       u/->set)
+                  " " $y ")"))
+
+            (every? #(some (partial u/code= $z) %) =-pairs)
+            (u/reg-compression!
+             :compact-clj/or->contains?
+             node
+             $or
+             (str "(contains? "
+                  (->> =-pairs
+                       (map (fn [[x y]] (if (= x $z) y x)))
+                       distinct
+                       u/->set)
+                  " " $z ")"))))))
+
 (defn all [{:keys [node]}]
   (when (and (u/in-source? node) (legal? node))
-    ((juxt or-remove-nested or->some) node)))
+    ((juxt or-remove-nested or->some or->contains?) node)))

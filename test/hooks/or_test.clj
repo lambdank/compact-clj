@@ -31,3 +31,14 @@
   (tu/test-example! #'hooks.or/or->some)
   (is (:pass? (tc/quick-check 100 or->some-equivalent-property))))
 
+(def or->set
+  (prop/for-all [x (tu/generator ::tu/not-symbol)
+                 coll (tu/generator [:sequential {:min 2 :max 10}
+                                     ::tu/not-symbol])]
+                (let [xs (map #(cons '= (shuffle [x %])) coll)
+                      input (str `(~'or ~@xs))]
+                  (tu/equivalent? hooks.or/or->contains? input))))
+
+(deftest or->set-test
+  (tu/test-example! #'hooks.or/or->contains?)
+  (is (:pass? (doto (tc/quick-check 100 or->set) tap>))))
