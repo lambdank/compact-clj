@@ -25,11 +25,13 @@
 (defn or->some
   {:type :compact-clj/or->some
    :example {:in '(or (f x) (f y))
-             :out '(some f [x y])}}
+             :out '(some f [x y])}
+   :unsafe [:false->nil]}
   [{:keys [children] :as node}]
   (let [[$or & $args] children
         {[$pred] :children} (first $args)]
-    (when (and (every? #(and (u/list? %) (u/count? % 2)) $args)
+    (when (and (< 1 (count $args))
+               (every? #(and (u/list? %) (u/count? % 2)) $args)
                (every? (fn [{[pred] :children}] (= pred $pred)) (rest $args)))
       (u/reg-compression!
        :compact-clj/or->some
