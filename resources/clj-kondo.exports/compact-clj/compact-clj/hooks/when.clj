@@ -15,6 +15,7 @@
         [$not $x] (:children $test)]
     (when (and (u/list? $test)
                (u/symbol? $not "not")
+               (seq $body)
                (u/count? $test 2))
       (u/reg-compression!
        :compact-clj/when->when-not
